@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #000000;
+    color: white;
+    overflow-x: hidden;
+}
+
+body {
+    background: linear-gradient(160deg,#480a9a 0%,#8c1477 42%,#5a2068 68%,#372659 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 414px;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: linear-gradient(160deg,#480a9a 0%,#8c1477 42%,#5a2068 68%,#372659 100%);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+
+
+/* Contenido principal */
+.main-content {
+    flex: 1;
+    padding: 40px 25px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.login-form {
+    width: 100%;
+    max-width: 350px;
+    margin-top: 50px;
+}
+
+.login-form .page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: left;
+    margin-bottom: 30px;
+    padding-left: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-input {
+    width: 100%;
+    font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    padding: 14px 18px;
+    background: transparent;
+    border: 1px solid #ffffff;
+    border-radius: 25px;
+    color: #ffffff;
+    font-size: 15px;
+    transition: all 0.25s ease;
+}
+
+.form-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #00e5ff;
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.15);
+}
+
+.form-input:hover {
+    border-color: #00e5ff;
+}
+
+/* Animación de carga */
+.container {
+    animation: slideIn 0.4s ease-out;
+}
+
+.submit-button {
+    width: auto;
+    background: linear-gradient(90deg, #ff007a, #7b2ff7);
+    color: #ffffff;
+    padding: 12px 32px;
+    font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ffffff00;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.submit-button:hover {
+    background: rgba(0, 188, 212, 0.1);
+    border-color: #00e5ff;
+    transform: translateY(-1px);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+}
+
+.form-container, .form-title {
+
+    margin-top: 10rem;
+    text-align: center;
+}
+

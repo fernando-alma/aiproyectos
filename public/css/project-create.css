@@ -1,0 +1,206 @@
+/* =========================================
+   RESET ESPECÍFICO & CONFIGURACIÓN
+   ========================================= */
+:root {
+    --cp-bg-dark: #020617;
+    --cp-card-bg: rgba(20, 20, 35, 0.6);
+    --cp-primary: #9b0993;
+    --cp-secondary: #480a9a;
+    --cp-accent: #00bcd4;
+    --cp-text: #ffffff;
+    --cp-text-muted: rgba(255, 255, 255, 0.6);
+    --cp-border: rgba(255, 255, 255, 0.1);
+    --cp-font: 'Raleway', sans-serif;
+}
+
+/* Fondo general de la página de creación */
+body.create-project-page {
+     background-image: url("/public/images/fondos/fondo.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--cp-text);
+    font-family: var(--cp-font);
+    margin: 0 auto;
+    height: 100vh;
+}
+
+/* =========================================
+   LAYOUT & CONTENEDOR
+   ========================================= */
+.main-content {
+    padding: 40px 20px;
+    min-height: calc(100vh - 150px); /* Ajuste para footer/nav */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-container {
+    background: var(--cp-card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--cp-border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #fff, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-subtitle {
+    color: var(--cp-text-muted);
+    font-size: 0.95rem;
+}
+
+/* =========================================
+   INPUTS & LABELS
+   ========================================= */
+.project-form .form-group {
+    margin-bottom: 25px;
+}
+
+.project-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--cp-text);
+    letter-spacing: 0.5px;
+}
+
+.project-form input[type="text"],
+.project-form input[type="url"],
+.project-form textarea,
+.project-form input[type="file"] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cp-border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #fff;
+    font-family: var(--cp-font);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Crucial para evitar desbordes */
+}
+
+.project-form input:focus,
+.project-form textarea:focus {
+    outline: none;
+    border-color: var(--cp-primary);
+    box-shadow: 0 0 0 3px rgba(155, 9, 147, 0.2);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.project-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.project-form small {
+    display: block;
+    margin-top: 6px;
+    color: var(--cp-text-muted);
+    font-size: 0.8rem;
+}
+
+/* Estilo simple para el input file */
+.file-input-wrapper input[type="file"] {
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: var(--cp-font);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+/* Botón Principal (Crear) */
+.btn-primary {
+    background: var(--cp-primary);
+    color: white;
+    flex: 2; /* Ocupa más espacio */
+    min-width: 150px;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 10px 20px rgba(155, 9, 147, 0.3);
+}
+
+/* Botón Outline (Vista Previa) */
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--cp-accent);
+    color: var(--cp-accent);
+    flex: 1;
+}
+
+.btn-outline:hover {
+    background: rgba(0, 188, 212, 0.1);
+}
+
+/* Botón Secundario (Cancelar) */
+.btn-secondary {
+    background: transparent;
+    color: var(--cp-text-muted);
+    flex: 1;
+}
+
+.btn-secondary:hover {
+    color: white;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px 15px;
+    }
+    
+    .form-container {
+        padding: 25px 20px;
+    }
+
+    .button-group {
+        flex-direction: column-reverse; /* El botón principal arriba en móviles */
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+}

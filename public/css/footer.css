@@ -1,0 +1,153 @@
+/* Variables de color para fácil modificación */
+:root {
+    --color-fondo: #000000; 
+    --color-texto-principal: #ffffff; 
+    --color-texto-secundario: #aaaaaa; 
+    --color-separador: #333333; 
+}
+
+/* 1. Estilos generales del footer (Compactación) */
+.aiwknd-footer {
+    background-color: var(--color-fondo);
+    color: var(--color-texto-principal);
+    padding: 40px 0 25px; 
+    font-family: Arial, sans-serif;
+}
+
+/* Contenido principal del footer (secciones) */
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    gap: 30px; 
+}
+
+/* Estilo de la primera sección (logo y texto) */
+.footer-section.about {
+    flex: 2; 
+    max-width: 300px;
+}
+
+/* 2. Nuevo estilo para el Logo (Alineación y Cercanía) */
+.footer-logo {
+    width: 200px; 
+    height: auto;
+    margin-bottom: 0px; 
+    margin-top: 0px; 
+    margin-left: -30px; 
+    display: block;
+}
+
+/* 3. Párrafo descriptivo (Alineación y Cercanía) */
+.footer-section.about p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-texto-secundario);
+    
+    margin-top: -8px; 
+    margin-bottom: 20px;
+    margin-left: 0px; 
+}
+
+/* Títulos de las columnas (se mantiene) */
+.footer-section h3 {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--color-texto-principal);
+    margin-bottom: 15px;
+}
+
+/* Lista de enlaces (Efecto Hover de color) */
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-section ul li a {
+    text-decoration: none;
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+    transition: color 0.3s;
+    display: inline-block;
+}
+
+.footer-section ul li a:hover {
+    color: var(--color-texto-principal); 
+}
+/* Estilo para la caja contenedora (el enlace <a>) */
+.social-links a {
+    font-size: 0; 
+    margin-right: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    
+    /* Forma y tamaño del círculo */
+    width: 40px; /* Tamaño ligeramente ajustado */
+    height: 40px; 
+    border-radius: 50%; 
+    background-color: var(--color-texto-principal); 
+    border: 1px solid var(--color-texto-principal); 
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0; 
+}
+
+/* Efecto Hover:*/
+.social-links a:hover {
+    scale: 1.1;
+    background-color: #eee; 
+}
+
+/* Estilo para la IMAGEN PNG dentro del enlace */
+.social-links a img {
+    /* Ocupa la mayor parte del círculo */
+    width: 38px; 
+    height: 38px;
+    display: block;
+    margin: 0;
+}
+
+/* Línea divisoria (más compacta) */
+.footer-divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--color-separador);
+    margin: 30px auto 15px; 
+    max-width: 1200px;
+}
+
+/* Sección de derechos de autor */
+.footer-bottom {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-texto-secundario);
+    padding-top: 10px;
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-wrap: wrap; 
+        justify-content: flex-start;
+    }
+    
+    .footer-section {
+        flex: 0 0 45%; 
+        margin-bottom: 30px;
+    }
+    
+    .footer-section.about {
+        flex: 0 0 100%; 
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-section {
+        flex: 0 0 100%; 
+    }
+}

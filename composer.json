@@ -1,0 +1,14 @@
+{
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\Models\\": "frontend/models/",
+            "App\\Backend\\Controllers\\": "backend/app/Controllers/",
+            "App\\Backend\\Models\\": "backend/app/Models/",
+            "App\\Backend\\": "backend/app/",
+            "App\\Frontend\\": "frontend/"
+        }
+    }
+}

@@ -1,0 +1,408 @@
+openapi: "3.0.3"
+info:
+  title: "AI Proyectos AWKND 2026 — Documentación API"
+  description: |
+    REST API del sistema de gestión de proyectos del hackathon AI Proyectos AWKND 2026.
+    
+    ## Autenticación
+    La mayoría de los endpoints protegidos requieren un **JWT Bearer token**.
+    Obtené el token con `POST /auth/login` o `POST /auth/register` y envialo en el header:
+    ```
+    Authorization: Bearer <token>
+    ```
+  version: "1.0.0"
+  contact:
+    name: "AI Proyectos AWKND 2026 — Documentación API"
+
+servers:
+  - url: "http://localhost/aiproyectos/backend/public"
+    description: "Desarrollo local"
+  - url: "https://tudominio.com/backend/public"
+    description: "Producción"
+
+tags:
+  - name: Auth
+    description: Registro, login y gestión de sesión
+  - name: Dashboards
+    description: Hackathons / eventos
+  - name: Projects
+    description: Proyectos de los grupos
+  - name: Tasks
+    description: Tareas de cada proyecto
+  - name: Members
+    description: Miembros del sistema
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:              { type: integer, example: 1 }
+        name:            { type: string,  example: "Fernando Alma" }
+        email:           { type: string,  format: email, example: "fer@ejemplo.com" }
+        role:            { type: string,  enum: [admin, user], example: "user" }
+        avatar_initials: { type: string,  example: "FA" }
+        created_at:      { type: string,  format: date-time }
+
+    AuthResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        token:   { type: string,  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+        user:    { $ref: "#/components/schemas/User" }
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string,  example: "Descripción del error." }
+
+    Dashboard:
+      type: object
+      properties:
+        id:          { type: integer }
+        slug:        { type: string,  example: "hola" }
+        title:       { type: string,  example: "AI Day 2025" }
+        description: { type: string }
+        color:       { type: string,  example: "blue" }
+        created_by:  { type: string }
+        created_at:  { type: string,  format: date-time }
+
+    Project:
+      type: object
+      properties:
+        id:           { type: integer }
+        dashboard_id: { type: integer }
+        title:        { type: string }
+        description:  { type: string }
+        status:       { type: string, enum: [in_progress, completed] }
+        group_name:   { type: string }
+        link_video:   { type: string }
+        link_deploy:  { type: string }
+        members_data: { type: string }
+        created_at:   { type: string, format: date-time }
+
+# ======================================================================
+paths:
+
+  # ---------------- AUTH ------------------------------------------------
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Registrar usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirm]
+              properties:
+                name:             { type: string,  example: "Fernando Alma" }
+                email:            { type: string,  format: email }
+                password:         { type: string,  minLength: 8 }
+                password_confirm: { type: string }
+      responses:
+        "201":
+          description: Usuario creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "400":
+          description: Validación fallida
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: Email ya registrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:    { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200":
+          description: Login exitoso — devuelve JWT
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "401":
+          description: Credenciales incorrectas
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Perfil del usuario autenticado
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Datos del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  user:    { $ref: "#/components/schemas/User" }
+        "401":
+          description: Token inválido o expirado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Cerrar sesión (client-side)
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Instrucción de logout enviada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+
+  /auth/change-password:
+    post:
+      tags: [Auth]
+      summary: Cambiar contraseña
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password, new_password_confirm]
+              properties:
+                current_password:     { type: string }
+                new_password:         { type: string, minLength: 8 }
+                new_password_confirm: { type: string }
+      responses:
+        "200":
+          description: Contraseña actualizada
+        "401":
+          description: Contraseña actual incorrecta
+
+  # ---------------- DASHBOARDS ------------------------------------------
+  /dashboards:
+    get:
+      tags: [Dashboards]
+      summary: Listar todos los dashboards
+      responses:
+        "200":
+          description: Lista de dashboards
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Dashboard" }
+
+  /dashboard/get:
+    get:
+      tags: [Dashboards]
+      summary: Obtener un dashboard por slug
+      parameters:
+        - name: slug
+          in: query
+          required: true
+          schema: { type: string, example: "hola" }
+      responses:
+        "200":
+          description: Dashboard encontrado
+        "404":
+          description: No encontrado
+
+  /dashboard/create:
+    post:
+      tags: [Dashboards]
+      summary: Crear dashboard
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, slug]
+              properties:
+                title:       { type: string }
+                slug:        { type: string }
+                description: { type: string }
+                color:       { type: string }
+      responses:
+        "201": { description: Creado }
+
+  # ---------------- PROJECTS --------------------------------------------
+  /project/getProjects:
+    get:
+      tags: [Projects]
+      summary: Listar proyectos de un dashboard
+      parameters:
+        - name: slug
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Lista de proyectos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Project" }
+
+  /project/get:
+    get:
+      tags: [Projects]
+      summary: Obtener un proyecto por ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Proyecto }
+        "404": { description: No encontrado }
+
+  /project/create:
+    post:
+      tags: [Projects]
+      summary: Crear proyecto
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [title, description, slug]
+              properties:
+                title:        { type: string }
+                description:  { type: string }
+                slug:         { type: string }
+                status:       { type: string, enum: [in_progress, completed] }
+                group_name:   { type: string }
+                link_video:   { type: string }
+                link_deploy:  { type: string }
+                members_data: { type: string }
+                pitch:        { type: string }
+                image:        { type: string, format: binary }
+      responses:
+        "201": { description: Proyecto creado }
+
+  /project/sendJoinRequest:
+    post:
+      tags: [Projects]
+      summary: Solicitar unirse a un proyecto
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [project_id]
+              properties:
+                project_id: { type: integer }
+      responses:
+        "200": { description: Solicitud enviada }
+
+  /project/approveJoinRequest:
+    post:
+      tags: [Projects]
+      summary: Aprobar solicitud de unión
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [request_id]
+              properties:
+                request_id: { type: integer }
+      responses:
+        "200": { description: Aprobada }
+
+  /project/rejectJoinRequest:
+    post:
+      tags: [Projects]
+      summary: Rechazar solicitud de unión
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [request_id]
+              properties:
+                request_id: { type: integer }
+      responses:
+        "200": { description: Rechazada }
+
+  # ---------------- TASKS -----------------------------------------------
+  /task/create:
+    post:
+      tags: [Tasks]
+      summary: Crear tarea
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [project_id, title]
+              properties:
+                project_id:  { type: integer }
+                title:       { type: string }
+                description: { type: string }
+      responses:
+        "201": { description: Tarea creada }
+
+  /task/updateStatus:
+    post:
+      tags: [Tasks]
+      summary: Cambiar estado de una tarea
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, status]
+              properties:
+                id:     { type: integer }
+                status: { type: string, enum: [pending, in_progress, completed] }
+      responses:
+        "200": { description: Estado actualizado }
