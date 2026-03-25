@@ -14,7 +14,7 @@ use App\Backend\Router;
 
 // --- CONFIGURACIÓN CORS ---
 $allowedOrigins = [
-    'https://aiday-utn-sanrafael-2025.alphadocere.cl', // Producción
+     // Producción
     'http://localhost:5500', // Desarrollo
     'http://127.0.0.1:5500',
     'http://localhost'

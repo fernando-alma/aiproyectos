@@ -1,5 +1,10 @@
-const API_BASE = "https://aiday-utn-sanrafael-2025.alphadocere.cl/backend/public/";
-const CURRENT_SLUG = "hola";
+//const API_BASE = "https://aiday-utn-sanrafael-2025.alphadocere.cl/backend/public/";
+//const CURRENT_SLUG = "hola";
+//const API_BASE = "http://localhost/aiproyectos/backend/public/";
+
+// Usamos la configuración global en lugar de una URL fija
+const API_BASE = CONFIG.API_BASE;
+const CURRENT_SLUG = CONFIG.SLUG;
 
 document.addEventListener("DOMContentLoaded", () => {
   const allProjectsGrid = document.getElementById("allProjectsGrid");

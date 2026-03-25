@@ -34,7 +34,7 @@ try {
 // 5. Configuración de CORS con Whitelist (Lista Blanca)
 // Ajusta estos dominios a los de tu nuevo frontend
 $allowedOrigins = [
-    'https://aiday-utn-sanrafael-2025.alphadocere.cl',
+     // Producción,
     'http://localhost:5500', // VSCode Live Server
     'http://127.0.0.1:5500',
     'http://localhost'       // XAMPP default
