@@ -1,9 +1,28 @@
+<?php
+/**
+ * Inyección de variables de entorno al Frontend
+ * Esto permite que JS conozca la API_BASE sin hardcodear URLs
+ */
+$appUrl = $_ENV['APP_URL'] ?? 'http://localhost/aiproyectos';
+?>
+<script>
+    // Creamos un objeto global de configuración
+    window.CONFIG = {
+        APP_URL: "<?php echo rtrim($appUrl, '/'); ?>",
+        API_BASE: "<?php echo rtrim($appUrl, '/'); ?>/backend/public/",
+        SLUG: 'hola' // Puedes cambiar esto por una variable del .env si lo deseas a futuro
+    };
+    console.log('Fase 4: Configuración dinámica cargada:', window.CONFIG.API_BASE);
+</script>
+
+
+
 <nav class="navbar">
     <div class="nav-container">
 
         <!-- Logo -->
-        <a href="http://localhost/aiday-utn-sanrafael-2025/" class="nav-logo">
-            <img src="public/images/AIWKND-negro-solo.png" alt="AIWKND Logo" class="logo-img">
+        <a href="http://localhost/aiproyectos/" class="nav-logo">
+            <img src="public/images/aiwknd.png" alt="AIWKND Logo" class="logo-img">
         </a>
 
         <!-- Botón menú -->

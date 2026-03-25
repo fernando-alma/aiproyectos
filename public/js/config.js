@@ -10,18 +10,18 @@ console.log('API conectada a:', CONFIG.API_BASE); */
 
 
 // ------------------------------------------------------------------
+/**
+ * config.js - Inicializador de configuración global
+ * Los valores reales vienen inyectados desde el servidor (nav.php)
+ * Si por alguna razón no se inyectaron, este archivo actúa como fallback.
+ */
 
-// Detección automática del entorno (Local vs Producción)
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+if (!window.CONFIG) {
+    window.CONFIG = {
+        API_BASE: window.location.origin + '/aiproyectos/backend/public/',
+        SLUG: 'hola'
+    };
+}
 
-const CONFIG = {
-    // Si estamos en XAMPP usa la carpeta 'aiproyectos', si es producción usa la raíz
-    API_BASE: isLocalhost 
-        ? window.location.origin + '/aiproyectos/backend/public/' 
-        : window.location.origin + '/backend/public/',
-    
-    // Slug por defecto para el dashboard
-    SLUG: 'hola' 
-};
-
-console.log('API conectada a:', CONFIG.API_BASE);
+// Hacemos que la constante sea accesible globalmente de forma sencilla
+const CONFIG = window.CONFIG;
