@@ -12,12 +12,16 @@ try {
 }
 
 use App\Backend\Router;
+use App\Backend\Middleware\AuthMiddleware;
 
-// 2. CONFIGURACIÓN CORS DINÁMICA
+// 2. INICIALIZAR SEGURIDAD
+// Cargamos la clave secreta del .env en el Middleware antes de que el Router trabaje
+AuthMiddleware::init();
+
+// 3. CONFIGURACIÓN CORS DINÁMICA
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $appUrl = $_ENV['APP_URL'] ?? 'http://localhost/aiproyectos';
 
-// Si la petición viene de nuestra APP_URL o de localhost, la permitimos
 if ($origin === $appUrl || str_contains($origin, 'localhost') || str_contains($origin, '127.0.0.1')) {
     header("Access-Control-Allow-Origin: " . $origin);
     header("Access-Control-Allow-Credentials: true");
@@ -34,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// 3. CONFIGURACIÓN DEL ROUTER DINÁMICA
+// 4. CONFIGURACIÓN DEL ROUTER DINÁMICA
 $scriptName = $_SERVER['SCRIPT_NAME']; 
 $basePath = str_replace('/index.php', '', $scriptName); 
 

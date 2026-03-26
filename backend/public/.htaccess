@@ -2,13 +2,14 @@
     Options -MultiViews
     RewriteEngine On
     
-    # Eliminamos el RewriteBase fijo para que Apache lo detecte según la carpeta
-    # RewriteBase /backend/public/ 
+    # IMPORTANTE: Captura el Header de Autorización para JWT
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Si el archivo o directorio existe, se abre normalmente
+    # Si el archivo existe (como las fotos subidas), ábrelo
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
-    # Todo lo demás se envía al index.php
+    # Si no existe, mándalo al index.php del backend (Backend Router)
     RewriteRule ^(.*)$ index.php [QSA,L]
 </IfModule>
