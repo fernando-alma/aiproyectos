@@ -3,19 +3,22 @@
 require_once __DIR__ . '/autoload.php';
 require_once __DIR__ . '/Router.php';
 
-// Cargar variables para que las vistas puedan acceder a configs si es necesario
+// Cargar variables de entorno
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 try {
     $dotenv->load();
-} catch (Exception $e) {}
+} catch (Exception $e) {
+    // Si no hay .env, el sistema usará valores por defecto
+}
 
-// IMPORTANTE: Dejar vacío porque el proyecto está en la raíz del subdominio
-if ($_ENV === "PRODUCTION") {
-    $basePath = '';
-} 
-$basePath = '/aiproyectos'; 
+/**
+ * CONFIGURACIÓN DEL BASE PATH
+ * Detectamos si estamos en subcarpeta (XAMPP) o raíz (Producción)
+ */
+$scriptName = $_SERVER['SCRIPT_NAME'];
+$basePath = str_replace('/index.php', '', $scriptName);
 
-// Cargar las definiciones de rutas
+// Cargar las definiciones de rutas de las vistas
 $routes = require_once __DIR__ . '/routes.php';
 
 $router = new \App\Frontend\Router($routes, $basePath);
