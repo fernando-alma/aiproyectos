@@ -15,7 +15,7 @@ class UserModel
     }
 
     // ------------------------------------------------------------------
-    // Registro de usuario
+    // Registro de usuario (Por defecto nace como 'user' en la DB)
     // ------------------------------------------------------------------
     public function create(string $name, string $email, string $password): array|false
     {
@@ -56,7 +56,7 @@ class UserModel
             return false;
         }
 
-        // No exponer el hash al exterior
+        // No exponer el hash al exterior por seguridad
         unset($user['password_hash']);
         return $user;
     }
@@ -87,10 +87,23 @@ class UserModel
     }
 
     // ------------------------------------------------------------------
-    // Actualizar perfil
+    // Obtener todos los usuarios (Exclusivo para Súper Admin)
+    // ------------------------------------------------------------------
+    public function findAll(): array
+    {
+        $stmt = $this->db->query(
+            "SELECT id, name, email, role, avatar_initials, created_at 
+             FROM users ORDER BY created_at DESC"
+        );
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ------------------------------------------------------------------
+    // Actualizar perfil (Solo datos permitidos)
     // ------------------------------------------------------------------
     public function update(int $id, array $data): bool
     {
+        // IMPORTANTE: 'role' NO está aquí para evitar escalada de privilegios
         $allowed = ['name', 'avatar_initials'];
         $sets = [];
         $params = [':id' => $id];
@@ -109,6 +122,19 @@ class UserModel
         $sql  = "UPDATE users SET " . implode(', ', $sets) . " WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($params);
+    }
+
+    // ------------------------------------------------------------------
+    // Actualizar ROL (Exclusivo para Súper Admin)
+    // ------------------------------------------------------------------
+    public function updateRole(int $id, string $role): bool
+    {
+        // Validar estrictamente los roles permitidos
+        if (!in_array($role, ['user', 'admin'])) {
+            return false;
+        }
+        $stmt = $this->db->prepare("UPDATE users SET role = :role WHERE id = :id");
+        return $stmt->execute([':role' => $role, ':id' => $id]);
     }
 
     // ------------------------------------------------------------------
