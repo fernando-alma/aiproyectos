@@ -6,7 +6,8 @@ use App\Backend\Models\ProjectModel;
 use App\Backend\Models\DashboardModel;
 use App\Backend\Models\TaskModel;
 use App\Backend\Models\MemberModel;
-use App\Backend\Middleware\AuthMiddleware; // IMPORTANTE: Agregamos el Middleware
+use App\Backend\Models\JoinRequestModel; 
+use App\Backend\Middleware\AuthMiddleware;
 
 class ProjectController
 {
@@ -14,6 +15,7 @@ class ProjectController
     private $dashboardModel;
     private $taskModel;
     private $memberModel;
+    private $joinRequestModel;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class ProjectController
         $this->dashboardModel = new DashboardModel();
         $this->taskModel = new TaskModel();
         $this->memberModel = new MemberModel();
+        $this->joinRequestModel = new JoinRequestModel(); // Inicializamos
     }
 
     public function create()
@@ -29,11 +32,9 @@ class ProjectController
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
 
-        // 1. Obtenemos la identidad del Token
         $userPayload = AuthMiddleware::require();
         $userId = (int) $userPayload['sub'];
 
-        // 2. Recolección de datos
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
         $status = $_POST['status'] ?? 'in_progress';
@@ -52,7 +53,6 @@ class ProjectController
             $status = 'in_progress';
         }
 
-        // 3. Crear el proyecto pasando el $userId como Creador
         $projectId = $this->projectModel->createProject(
             $pitch, $dashboardSlug, $title, $description, $status, 
             $groupName, $linkVideo, $linkDeploy, $userId, null
@@ -62,7 +62,6 @@ class ProjectController
             $this->sendJsonResponse(['success' => false, 'message' => 'Error al crear el proyecto o dashboard no encontrado.'], 500);
         }
 
-        // 4. Manejo de Imagen
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/../../public/uploads/projects/';
             if (!is_dir($uploadDir)) {
@@ -92,7 +91,6 @@ class ProjectController
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
 
-        // 1. Identidad y validación de Dueño
         $userPayload = AuthMiddleware::require();
         $userId = (int) $userPayload['sub'];
         $userRole = $userPayload['role'] ?? 'user';
@@ -107,12 +105,10 @@ class ProjectController
             $this->sendJsonResponse(['success' => false, 'message' => 'Proyecto no encontrado'], 404);
         }
 
-        // REGLA DE ORO: Solo el Creador o un Admin pueden editar
         if ($project['created_by_user_id'] != $userId && $userRole !== 'admin') {
             $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para editar este proyecto.'], 403);
         }
 
-        // 2. Recolección de datos
         $title = $_POST['title'] ?? $project['title'];
         $description = $_POST['description'] ?? $project['description'];
         $status = $_POST['status'] ?? $project['status'];
@@ -121,7 +117,6 @@ class ProjectController
         $linkVideo = $_POST['link_video'] ?? $project['link_video'];
         $linkDeploy = $_POST['link_deploy'] ?? $project['link_deploy'];
 
-        // 3. Manejo de Imagen Segura
         $imageUrl = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/../../public/uploads/projects/';
@@ -136,7 +131,6 @@ class ProjectController
             }
         }
 
-        // 4. Actualización
         $result = $this->projectModel->updateProject(
             (int)$projectId, $title, $description, $status, $pitch, 
             $groupName, $linkVideo, $linkDeploy, $imageUrl
@@ -155,7 +149,6 @@ class ProjectController
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
 
-        // 1. Identidad y validación de Dueño
         $userPayload = AuthMiddleware::require();
         $userId = (int) $userPayload['sub'];
         $userRole = $userPayload['role'] ?? 'user';
@@ -170,7 +163,6 @@ class ProjectController
             $this->sendJsonResponse(['success' => false, 'message' => 'Proyecto no encontrado'], 404);
         }
 
-        // REGLA DE ORO: Solo el Creador o un Admin pueden eliminar
         if ($project['created_by_user_id'] != $userId && $userRole !== 'admin') {
             $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para eliminar este proyecto.'], 403);
         }
@@ -211,12 +203,137 @@ class ProjectController
         }
     }
 
-    // --- MÉTODOS AUXILIARES ---
-    public function createProjectsMember()
+    // =========================================================================
+    // PASO 3: GESTIÓN DE SOLICITUDES Y MIEMBROS
+    // =========================================================================
+
+    public function sendJoinRequest()
     {
-        // Esto lo refactorizaremos en el PASO 3 (Gestión de miembros)
-        $this->sendJsonResponse(['success' => true, 'message' => 'Pendiente de refactorización'], 200);
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->sendJsonResponse(['success' => false], 405);
+        
+        $userPayload = AuthMiddleware::require();
+        $userId = (int) $userPayload['sub'];
+        $userName = $userPayload['name'];
+        $userEmail = $userPayload['email'];
+
+        // Recibir los datos en JSON o POST normal
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? $_POST;
+        $projectId = $data['project_id'] ?? null;
+
+        if (!$projectId) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'ID de proyecto requerido.'], 400);
+        }
+
+        $result = $this->joinRequestModel->createRequest((int)$projectId, $userId, $userName, $userEmail);
+        
+        if ($result['success']) {
+            $this->sendJsonResponse(['success' => true, 'message' => 'Solicitud enviada correctamente.'], 201);
+        } else {
+            $this->sendJsonResponse(['success' => false, 'message' => $result['message']], 400);
+        }
     }
+
+    public function getJoinRequests()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') $this->sendJsonResponse(['success' => false], 405);
+
+        $userPayload = AuthMiddleware::require();
+        $userId = (int) $userPayload['sub'];
+        $userRole = $userPayload['role'] ?? 'user';
+
+        $projectId = $_GET['project_id'] ?? null;
+        if (!$projectId) $this->sendJsonResponse(['success' => false, 'message' => 'ID de proyecto requerido.'], 400);
+
+        // Validación de Dueño
+        $project = $this->projectModel->getProjectById((int)$projectId);
+        if (!$project || ($project['created_by_user_id'] != $userId && $userRole !== 'admin')) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para ver estas solicitudes.'], 403);
+        }
+
+        $requests = $this->joinRequestModel->getPendingRequests((int)$projectId);
+        $this->sendJsonResponse(['success' => true, 'requests' => $requests], 200);
+    }
+
+    public function approveJoinRequest()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->sendJsonResponse(['success' => false], 405);
+
+        $userPayload = AuthMiddleware::require();
+        $userId = (int) $userPayload['sub'];
+        $userRole = $userPayload['role'] ?? 'user';
+
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? $_POST;
+        $requestId = $data['request_id'] ?? null;
+
+        if (!$requestId) $this->sendJsonResponse(['success' => false, 'message' => 'ID de solicitud requerido.'], 400);
+
+        // Buscar la solicitud
+        $request = $this->joinRequestModel->getRequestById((int)$requestId);
+        if (!$request) $this->sendJsonResponse(['success' => false, 'message' => 'Solicitud no encontrada.'], 404);
+
+        // Validar que el usuario que aprueba es el DUEÑO del proyecto
+        $project = $this->projectModel->getProjectById($request['project_id']);
+        if (!$project || ($project['created_by_user_id'] != $userId && $userRole !== 'admin')) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para aprobar solicitudes en este proyecto.'], 403);
+        }
+
+        // 1. Cambiar estado
+        $this->joinRequestModel->updateStatus((int)$requestId, 'approved');
+        
+        // 2. Insertar como miembro
+        $memberResult = $this->memberModel->addProjectMember(
+            $request['project_id'], 
+            $request['user_id'], 
+            $request['user_name'], 
+            $request['email']
+        );
+
+        if ($memberResult['success']) {
+            $this->sendJsonResponse(['success' => true, 'message' => 'Solicitud aprobada y usuario añadido al equipo.']);
+        } else {
+            $this->sendJsonResponse(['success' => false, 'message' => 'Solicitud aprobada, pero hubo un error al añadir al usuario.'], 500);
+        }
+    }
+
+    public function rejectJoinRequest()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->sendJsonResponse(['success' => false], 405);
+
+        $userPayload = AuthMiddleware::require();
+        $userId = (int) $userPayload['sub'];
+        $userRole = $userPayload['role'] ?? 'user';
+
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? $_POST;
+        $requestId = $data['request_id'] ?? null;
+
+        if (!$requestId) $this->sendJsonResponse(['success' => false, 'message' => 'ID de solicitud requerido.'], 400);
+
+        $request = $this->joinRequestModel->getRequestById((int)$requestId);
+        if (!$request) $this->sendJsonResponse(['success' => false, 'message' => 'Solicitud no encontrada.'], 404);
+
+        $project = $this->projectModel->getProjectById($request['project_id']);
+        if (!$project || ($project['created_by_user_id'] != $userId && $userRole !== 'admin')) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para rechazar solicitudes en este proyecto.'], 403);
+        }
+
+        $this->joinRequestModel->updateStatus((int)$requestId, 'rejected');
+        $this->sendJsonResponse(['success' => true, 'message' => 'Solicitud rechazada.']);
+    }
+
+    public function getFollowedProjects() 
+    { 
+        $userPayload = AuthMiddleware::require();
+        $userId = (int) $userPayload['sub'];
+        $projects = $this->joinRequestModel->getFollowedProjectsByUserId($userId);
+        
+        $this->sendJsonResponse(['success' => true, 'projects' => $projects]); 
+    }
+
+    // --- MÉTODOS EXISTENTES INTACTOS ---
+    public function createProjectsMember() { $this->sendJsonResponse(['success'=>true, 'message'=>'Refactorizado. Usa approveJoinRequest.']); }
     public function getTasks() { $this->sendJsonResponse(['success'=>true, 'tasks'=>[]]); }
     public function getStats() { $this->sendJsonResponse(['success'=>true, 'stats'=>[]]); }
     public function getFiles() { $this->sendJsonResponse(['success'=>true, 'files'=>[]]); }
@@ -226,11 +343,6 @@ class ProjectController
         $this->sendJsonResponse(['success'=>true, 'members'=>$members]); 
     }
     public function getActivity() { $this->sendJsonResponse(['success'=>true, 'activity'=>[]]); }
-    public function getJoinRequests() { $this->sendJsonResponse(['success'=>true, 'requests'=>[]]); }
-    public function sendJoinRequest() { $this->sendJsonResponse(['success'=>true]); }
-    public function approveJoinRequest() { $this->sendJsonResponse(['success'=>true]); }
-    public function rejectJoinRequest() { $this->sendJsonResponse(['success'=>true]); }
-    public function getFollowedProjects() { $this->sendJsonResponse(['success'=>true, 'projects'=>[]]); }
 
     private function sendJsonResponse($data, $statusCode = 200)
     {
