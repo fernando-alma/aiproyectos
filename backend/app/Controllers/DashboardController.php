@@ -4,6 +4,7 @@ namespace App\Backend\Controllers;
 
 use App\Backend\Models\DashboardModel;
 use App\Backend\Models\ProjectModel;
+use App\Backend\Middleware\AuthMiddleware;
 
 class DashboardController
 {
@@ -16,9 +17,14 @@ class DashboardController
         $this->projectModel = new ProjectModel();
     }
 
+    /**
+     * PRIVADO: Solo el Súper Admin puede crear eventos
+     */
     public function create()
     {
-        // Asegurarse de que solo se acepten POST requests
+        // EL ESCUDO: Bloquea si no hay token o si el rol no es 'admin'
+        $user = AuthMiddleware::requireAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
@@ -26,8 +32,8 @@ class DashboardController
         $title = $_POST['title'] ?? '';
         $description = $_POST['description'] ?? '';
         $color = $_POST['color'] ?? 'blue';
-        $created_by = $_POST['created_by'] ?? '';
 
+        // Ya NO pedimos el slug aquí, porque el Modelo lo generará automáticamente.
         if (empty($title) || empty($description)) {
             $this->sendJsonResponse(['success' => false, 'message' => 'Título y descripción son requeridos'], 400);
         }
@@ -37,25 +43,34 @@ class DashboardController
             $color = 'blue';
         }
 
-        $slug = $this->dashboardModel->createDashboard($title, $description, $color, $created_by);
+        // Extraemos la identidad del creador desde el Token
+        $createdByName = $user['name'];
+        $createdByUserId = (int) $user['sub'];
+
+        // Llamamos al método correcto del modelo
+        $slug = $this->dashboardModel->createDashboard($title, $description, $color, $createdByName, $createdByUserId);
 
         if ($slug) {
             $this->sendJsonResponse([
                 'success' => true,
                 'message' => 'Dashboard creado exitosamente',
-                'slug' => $slug
+                'slug' => $slug // Devolvemos el slug automático generado
             ], 201);
         } else {
             $this->sendJsonResponse(['success' => false, 'message' => 'Error al crear el dashboard'], 500);
         }
     }
-//este se usa en cuando se buscan todos
+
+    /**
+     * PÚBLICO: Cualquier usuario puede ver la lista de eventos
+     */
     public function getDashboards()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
 
+        // Llamamos al método correcto del modelo
         $dashboards = $this->dashboardModel->getAllDashboards();
         
         if ($dashboards !== null) {
@@ -64,7 +79,10 @@ class DashboardController
             $this->sendJsonResponse(['success' => false, 'message' => 'No se pudieron obtener los dashboards.'], 500);
         }
     }
-    //este se usa en el dashboard en si mismo
+
+    /**
+     * PÚBLICO: Cualquier usuario puede ver los proyectos de un evento
+     */
     public function getDashboard()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -81,15 +99,19 @@ class DashboardController
         if ($dashboard) {
             // Obtener proyectos asociados al dashboard
             $dashboard['projects'] = $this->projectModel->getProjectsByDashboardSlug($slug);
-            
             $this->sendJsonResponse(['success' => true, 'dashboard' => $dashboard], 200);
         } else {
             $this->sendJsonResponse(['success' => false, 'message' => 'Dashboard no encontrado.'], 404);
         }
     }
 
+    /**
+     * PRIVADO: Solo el Súper Admin puede editar eventos
+     */
     public function update()
     {
+        AuthMiddleware::requireAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
@@ -115,8 +137,13 @@ class DashboardController
         }
     }
 
+    /**
+     * PRIVADO: Solo el Súper Admin puede eliminar eventos
+     */
     public function delete()
     {
+        AuthMiddleware::requireAdmin();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->sendJsonResponse(['success' => false, 'message' => 'Método no permitido'], 405);
         }
@@ -137,7 +164,7 @@ class DashboardController
     private function sendJsonResponse($data, $statusCode = 200)
     {
         http_response_code($statusCode);
-        header('Content-Type: application/json');
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data);
         exit;
     }

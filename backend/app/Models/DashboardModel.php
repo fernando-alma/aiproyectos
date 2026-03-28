@@ -14,12 +14,18 @@ class DashboardModel
         $this->conn = Database::getInstance()->getConnection();
     }
 
-    public function createDashboard(string $title, string $description, string $color, string $createdBy): ?string
+    /**
+     * Crear Dashboard inyectando el nombre y el ID del Súper Admin
+     */
+    public function createDashboard(string $title, string $description, string $color, string $createdByName, int $createdByUserId): ?string
     {
+        // Generamos el slug de forma automática a partir del título
         $slug = $this->generateUniqueSlug($title);
 
-        $stmt = $this->conn->prepare("INSERT INTO dashboards (slug, title, description, color, created_by) VALUES (?, ?, ?, ?, ?)");
-        if ($stmt->execute([$slug, $title, $description, $color, $createdBy])) {
+        // Insertamos guardando tanto el nombre como el ID real del creador
+        $stmt = $this->conn->prepare("INSERT INTO dashboards (slug, title, description, color, created_by, created_by_user_id) VALUES (?, ?, ?, ?, ?, ?)");
+        
+        if ($stmt->execute([$slug, $title, $description, $color, $createdByName, $createdByUserId])) {
             return $slug;
         }
         return null;
@@ -32,8 +38,6 @@ class DashboardModel
         $dashboard = $stmt->fetch(PDO::FETCH_ASSOC);
         return $dashboard ?: null;
     }
-
-  
 
     private function generateUniqueSlug(string $title): string
     {
@@ -64,7 +68,13 @@ class DashboardModel
 
     public function getAllDashboards(): array
     {
-        $stmt = $this->conn->query("SELECT  d.slug, d.title, d.description, d.color,d.created_at, d.created_by,(SELECT Count(*) FROM `projects` t where t.dashboard_id = d.id) as total_projects FROM dashboards d ORDER BY created_at DESC");
+        // Agregamos created_by_user_id a la consulta para el panel de administración
+        $stmt = $this->conn->query("
+            SELECT d.slug, d.title, d.description, d.color, d.created_at, d.created_by, d.created_by_user_id,
+                   (SELECT Count(*) FROM `projects` t where t.dashboard_id = d.id) as total_projects 
+            FROM dashboards d 
+            ORDER BY created_at DESC
+        ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
