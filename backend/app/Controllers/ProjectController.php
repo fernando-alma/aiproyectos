@@ -216,7 +216,6 @@ class ProjectController
         $userName = $userPayload['name'];
         $userEmail = $userPayload['email'];
 
-        // Recibir los datos en JSON o POST normal
         $raw = file_get_contents('php://input');
         $data = json_decode($raw, true) ?? $_POST;
         $projectId = $data['project_id'] ?? null;
@@ -245,7 +244,6 @@ class ProjectController
         $projectId = $_GET['project_id'] ?? null;
         if (!$projectId) $this->sendJsonResponse(['success' => false, 'message' => 'ID de proyecto requerido.'], 400);
 
-        // Validación de Dueño
         $project = $this->projectModel->getProjectById((int)$projectId);
         if (!$project || ($project['created_by_user_id'] != $userId && $userRole !== 'admin')) {
             $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para ver estas solicitudes.'], 403);
@@ -269,20 +267,16 @@ class ProjectController
 
         if (!$requestId) $this->sendJsonResponse(['success' => false, 'message' => 'ID de solicitud requerido.'], 400);
 
-        // Buscar la solicitud
         $request = $this->joinRequestModel->getRequestById((int)$requestId);
         if (!$request) $this->sendJsonResponse(['success' => false, 'message' => 'Solicitud no encontrada.'], 404);
 
-        // Validar que el usuario que aprueba es el DUEÑO del proyecto
         $project = $this->projectModel->getProjectById($request['project_id']);
         if (!$project || ($project['created_by_user_id'] != $userId && $userRole !== 'admin')) {
             $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para aprobar solicitudes en este proyecto.'], 403);
         }
 
-        // 1. Cambiar estado
         $this->joinRequestModel->updateStatus((int)$requestId, 'approved');
         
-        // 2. Insertar como miembro
         $memberResult = $this->memberModel->addProjectMember(
             $request['project_id'], 
             $request['user_id'], 
@@ -321,6 +315,49 @@ class ProjectController
 
         $this->joinRequestModel->updateStatus((int)$requestId, 'rejected');
         $this->sendJsonResponse(['success' => true, 'message' => 'Solicitud rechazada.']);
+    }
+
+    /**
+     * Expulsar a un miembro del proyecto
+     */
+    public function removeMember()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->sendJsonResponse(['success' => false], 405);
+
+        $userPayload = AuthMiddleware::require();
+        $currentUserId = (int) $userPayload['sub'];
+        $userRole = $userPayload['role'] ?? 'user';
+
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? $_POST;
+        
+        $projectId = $data['project_id'] ?? null;
+        $targetUserId = $data['user_id'] ?? null;
+
+        if (!$projectId || !$targetUserId) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'ID de proyecto y ID de usuario a expulsar requeridos.'], 400);
+        }
+
+        $project = $this->projectModel->getProjectById((int)$projectId);
+        if (!$project) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'Proyecto no encontrado.'], 404);
+        }
+
+        // Validación de Seguridad: Solo Dueño o Admin Global pueden expulsar
+        if ($project['created_by_user_id'] != $currentUserId && $userRole !== 'admin') {
+            $this->sendJsonResponse(['success' => false, 'message' => 'No tienes permiso para expulsar miembros de este proyecto.'], 403);
+        }
+
+        // Evitar que el creador se expulse a sí mismo (para no dejar el proyecto sin dueño)
+        if ($project['created_by_user_id'] == $targetUserId) {
+            $this->sendJsonResponse(['success' => false, 'message' => 'No puedes expulsar al creador del proyecto.'], 400);
+        }
+
+        if ($this->memberModel->deleteMember((int)$targetUserId, (int)$projectId)) {
+            $this->sendJsonResponse(['success' => true, 'message' => 'Miembro expulsado correctamente.']);
+        } else {
+            $this->sendJsonResponse(['success' => false, 'message' => 'Error al expulsar. El usuario no pertenece a este proyecto.'], 500);
+        }
     }
 
     public function getFollowedProjects() 

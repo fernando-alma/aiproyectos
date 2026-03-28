@@ -5,7 +5,7 @@ use App\Backend\Controllers\DashboardController;
 use App\Backend\Controllers\ProjectController;
 use App\Backend\Controllers\TaskController;
 use App\Backend\Controllers\MemberController;
-
+use App\Backend\Controllers\AdminController; 
 /**
  * Definición de Rutas de la API
  * 'ruta' => [Controlador, Método, Método HTTP, Protegido (bool)]
@@ -44,6 +44,7 @@ return [
     'project/getJoinRequests'     => ['controller' => ProjectController::class, 'method' => 'getJoinRequests',  'httpMethod' => 'GET',  'protected' => true],
     'project/approveJoinRequest'  => ['controller' => ProjectController::class, 'method' => 'approveJoinRequest', 'httpMethod' => 'POST', 'protected' => true],
     'project/rejectJoinRequest'   => ['controller' => ProjectController::class, 'method' => 'rejectJoinRequest',  'httpMethod' => 'POST', 'protected' => true],
+    'project/removeMember'        => ['controller' => ProjectController::class, 'method' => 'removeMember',       'httpMethod' => 'POST', 'protected' => true], // NUEVO: Para expulsar
     'project/getFollowedProjects' => ['controller' => ProjectController::class, 'method' => 'getFollowedProjects', 'httpMethod' => 'GET',  'protected' => true],
 
     // --- TAREAS (Todas Protegidas) ---
@@ -58,4 +59,11 @@ return [
     'member/getAll'       => ['controller' => MemberController::class, 'method' => 'getMembers',   'httpMethod' => 'GET'],
     'member/createMember' => ['controller' => MemberController::class, 'method' => 'createMember', 'httpMethod' => 'POST', 'protected' => true],
     'member/delete'       => ['controller' => MemberController::class, 'method' => 'delete',       'httpMethod' => 'POST', 'protected' => true],
+
+    // ==========================================================
+    // --- SUPER ADMIN --- (Nuevas Rutas para el Paso 5)
+    // ==========================================================
+    'admin/users'      => ['controller' => AdminController::class, 'method' => 'getUsers',   'httpMethod' => 'GET',  'protected' => true],
+    'admin/changeRole' => ['controller' => AdminController::class, 'method' => 'changeRole', 'httpMethod' => 'POST', 'protected' => true],
+    'admin/stats'      => ['controller' => AdminController::class, 'method' => 'getStats',   'httpMethod' => 'GET',  'protected' => true],
 ];
