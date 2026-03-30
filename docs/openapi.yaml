@@ -1,18 +1,31 @@
 openapi: "3.0.3"
 info:
-  title: "AI Proyectos AWKND 2026 — Documentación API"
+  title: "AI Proyectos AIWKND — API REST"
   description: |
-    REST API del sistema de gestión de proyectos del hackathon AI Proyectos AWKND 2026.
-    
+    REST API del sistema de gestión de proyectos del hackathon **AI Proyectos AIWKND 2026**.
+
     ## Autenticación
-    La mayoría de los endpoints protegidos requieren un **JWT Bearer token**.
+    Los endpoints protegidos requieren un **JWT Bearer token**.
     Obtené el token con `POST /auth/login` o `POST /auth/register` y envialo en el header:
     ```
-    Authorization: Bearer <token>
+    Authorization: Bearer <tu_token_aqui>
     ```
-  version: "1.0.0"
+
+    ## Roles
+    | Rol     | Descripción                                                       |
+    |---------|-------------------------------------------------------------------|
+    | `user`  | Usuario registrado. Puede crear proyectos, solicitar unirse, etc. |
+    | `admin` | Súper administrador. Acceso total al panel y gestión de usuarios.  |
+
+    ## Convenciones
+    - Todos los endpoints devuelven `Content-Type: application/json`.
+    - Los endpoints que crean proyectos aceptan `multipart/form-data` (por la imagen).
+    - Los demás endpoints protegidos aceptan `application/json`.
+    - Las respuestas siempre incluyen el campo `success: boolean`.
+
+  version: "2.0.0"
   contact:
-    name: "AI Proyectos AWKND 2026 — Documentación API"
+    name: "AI Proyectos AIWKND"
 
 servers:
   - url: "http://localhost/aiproyectos/backend/public"
@@ -22,16 +35,21 @@ servers:
 
 tags:
   - name: Auth
-    description: Registro, login y gestión de sesión
+    description: Registro, login y gestión de sesión del usuario
   - name: Dashboards
-    description: Hackathons / eventos
+    description: Gestión de hackathons / eventos
   - name: Projects
-    description: Proyectos de los grupos
-  - name: Tasks
-    description: Tareas de cada proyecto
+    description: Gestión de proyectos de los grupos
   - name: Members
-    description: Miembros del sistema
+    description: Gestión de miembros de proyectos
+  - name: Join Requests
+    description: Solicitudes para unirse a un proyecto
+  - name: Tasks
+    description: Gestión de tareas por proyecto
+  - name: Admin
+    description: Panel de Super Administrador (requiere rol admin)
 
+# ==========================================================================
 components:
   securitySchemes:
     bearerAuth:
@@ -40,22 +58,117 @@ components:
       bearerFormat: JWT
 
   schemas:
+
+    # --- Entidades base ---
     User:
       type: object
       properties:
         id:              { type: integer, example: 1 }
-        name:            { type: string,  example: "Fernando Alma" }
-        email:           { type: string,  format: email, example: "fer@ejemplo.com" }
+        name:            { type: string,  example: "Usuario Generico" }
+        email:           { type: string,  format: email, example: "usuario@demo.com" }
         role:            { type: string,  enum: [admin, user], example: "user" }
-        avatar_initials: { type: string,  example: "FA" }
+        avatar_initials: { type: string,  example: "UG" }
         created_at:      { type: string,  format: date-time }
 
+    Dashboard:
+      type: object
+      properties:
+        id:                 { type: integer, example: 24 }
+        slug:               { type: string,  example: "aiwknd-2026" }
+        title:              { type: string,  example: "AI Proyectos AIWKND 2026" }
+        description:        { type: string,  example: "Hackathon de inteligencia artificial" }
+        color:              { type: string,  example: "blue", enum: [blue, green, purple, red, orange, yellow, pink, indigo] }
+        created_by:         { type: string,  example: "Usuario Generico" }
+        created_by_user_id: { type: integer, example: 2 }
+        total_projects:     { type: integer, example: 12 }
+        created_at:         { type: string,  format: date-time }
+
+    Project:
+      type: object
+      properties:
+        id:                 { type: integer, example: 54 }
+        dashboard_id:       { type: integer, example: 24 }
+        dashboard_slug:     { type: string,  example: "aiwknd-2026" }
+        title:              { type: string,  example: "AIProyecto AIWKND" }
+        description:        { type: string }
+        status:             { type: string,  enum: [in_progress, completed], example: "in_progress" }
+        pitch:              { type: string,  example: "Una plataforma de gestión de proyectos." }
+        group_name:         { type: string,  example: "Grupo Alpha" }
+        link_video:         { type: string,  format: uri, example: "https://youtu.be/xyz" }
+        link_deploy:        { type: string,  format: uri, example: "https://miproyecto.vercel.app" }
+        image:              { type: string,  example: "/uploads/projects/project_54.png" }
+        created_by_user_id: { type: integer, example: 2 }
+        created_at:         { type: string,  format: date-time }
+        updated_at:         { type: string,  format: date-time }
+
+    ProjectMember:
+      type: object
+      properties:
+        id:              { type: integer, example: 1 }
+        project_id:      { type: integer, example: 54 }
+        user_id:         { type: integer, example: 3 }
+        user_name:       { type: string,  example: "Weekener San Rafael" }
+        email:           { type: string,  format: email }
+        role:            { type: string,  enum: [owner, admin, member], example: "member" }
+        avatar_initials: { type: string,  example: "WS" }
+        joined_at:       { type: string,  format: date-time }
+
+    JoinRequest:
+      type: object
+      properties:
+        id:          { type: integer, example: 5 }
+        project_id:  { type: integer, example: 54 }
+        user_id:     { type: integer, example: 3 }
+        user_name:   { type: string,  example: "Weekener San Rafael" }
+        email:       { type: string,  format: email }
+        status:      { type: string,  enum: [pending, approved, rejected], example: "pending" }
+        request_at:  { type: string,  format: date-time }
+        decision_at: { type: string,  format: date-time, nullable: true }
+
+    Task:
+      type: object
+      properties:
+        id:          { type: integer, example: 1 }
+        project_id:  { type: integer, example: 54 }
+        title:       { type: string,  example: "Implementar login" }
+        description: { type: string }
+        priority:    { type: string,  enum: [low, medium, high], example: "high" }
+        status:      { type: string,  enum: [pending, in_progress, completed], example: "pending" }
+        assigned_to: { type: string,  example: "Usuario Generico", nullable: true }
+        due_date:    { type: string,  format: date, example: "2026-04-30" }
+        created_at:  { type: string,  format: date-time }
+        updated_at:  { type: string,  format: date-time }
+
+    FollowedProject:
+      type: object
+      properties:
+        id:          { type: integer, example: 54 }
+        title:       { type: string,  example: "AIProyecto AIWKND" }
+        description: { type: string }
+        join_status: { type: string,  enum: [pending, approved, rejected] }
+
+    AdminStats:
+      type: object
+      properties:
+        total_users:      { type: integer, example: 42 }
+        total_admins:     { type: integer, example: 3 }
+        total_dashboards: { type: integer, example: 5 }
+        total_projects:   { type: integer, example: 87 }
+
+    # --- Respuestas genéricas ---
     AuthResponse:
       type: object
       properties:
         success: { type: boolean, example: true }
         token:   { type: string,  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
         user:    { $ref: "#/components/schemas/User" }
+        message: { type: string }
+
+    SuccessResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string,  example: "Operación realizada correctamente." }
 
     ErrorResponse:
       type: object
@@ -63,39 +176,20 @@ components:
         success: { type: boolean, example: false }
         message: { type: string,  example: "Descripción del error." }
 
-    Dashboard:
-      type: object
-      properties:
-        id:          { type: integer }
-        slug:        { type: string,  example: "hola" }
-        title:       { type: string,  example: "AI Day 2025" }
-        description: { type: string }
-        color:       { type: string,  example: "blue" }
-        created_by:  { type: string }
-        created_at:  { type: string,  format: date-time }
-
-    Project:
-      type: object
-      properties:
-        id:           { type: integer }
-        dashboard_id: { type: integer }
-        title:        { type: string }
-        description:  { type: string }
-        status:       { type: string, enum: [in_progress, completed] }
-        group_name:   { type: string }
-        link_video:   { type: string }
-        link_deploy:  { type: string }
-        members_data: { type: string }
-        created_at:   { type: string, format: date-time }
-
-# ======================================================================
+# ==========================================================================
 paths:
 
-  # ---------------- AUTH ------------------------------------------------
+  # ========================================================================
+  # AUTH
+  # ========================================================================
+
   /auth/register:
     post:
       tags: [Auth]
-      summary: Registrar usuario
+      summary: Registrar nuevo usuario
+      description: |
+        Crea una cuenta nueva. El rol inicial siempre es `user`.
+        Devuelve un JWT listo para usar.
       requestBody:
         required: true
         content:
@@ -104,23 +198,23 @@ paths:
               type: object
               required: [name, email, password, password_confirm]
               properties:
-                name:             { type: string,  example: "Fernando Alma" }
-                email:            { type: string,  format: email }
-                password:         { type: string,  minLength: 8 }
-                password_confirm: { type: string }
+                name:             { type: string,  example: "Usuario Generico" }
+                email:            { type: string,  format: email, example: "usuario@demo.com" }
+                password:         { type: string,  minLength: 8, example: "miPassword123" }
+                password_confirm: { type: string,  example: "miPassword123" }
       responses:
         "201":
-          description: Usuario creado
+          description: Usuario creado exitosamente
           content:
             application/json:
               schema: { $ref: "#/components/schemas/AuthResponse" }
         "400":
-          description: Validación fallida
+          description: Validación fallida (campos vacíos, contraseñas no coinciden, email inválido)
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "409":
-          description: Email ya registrado
+          description: El email ya está registrado
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -129,6 +223,42 @@ paths:
     post:
       tags: [Auth]
       summary: Iniciar sesión
+      description: |
+        Autentica al usuario y devuelve un JWT válido por 24 horas.
+
+        **Alias legacy:** también disponible como `POST /login` para compatibilidad.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:    { type: string, format: email, example: "usuario@demo.com" }
+                password: { type: string, example: "miPassword123" }
+      responses:
+        "200":
+          description: Login exitoso — devuelve JWT y datos del usuario
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "400":
+          description: Faltan email o contraseña
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          description: Credenciales incorrectas
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión (ruta legacy)
+      description: Alias de `POST /auth/login`. Mantenido por compatibilidad con el frontend anterior.
       requestBody:
         required: true
         content:
@@ -141,7 +271,7 @@ paths:
                 password: { type: string }
       responses:
         "200":
-          description: Login exitoso — devuelve JWT
+          description: Login exitoso
           content:
             application/json:
               schema: { $ref: "#/components/schemas/AuthResponse" }
@@ -155,19 +285,25 @@ paths:
     get:
       tags: [Auth]
       summary: Perfil del usuario autenticado
+      description: Devuelve los datos del usuario actual a partir del JWT. No expone el `password_hash`.
       security: [{ bearerAuth: [] }]
       responses:
         "200":
-          description: Datos del usuario
+          description: Datos del usuario autenticado
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   user:    { $ref: "#/components/schemas/User" }
         "401":
-          description: Token inválido o expirado
+          description: Token inválido, ausente o expirado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Usuario del token no encontrado en la base de datos
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -175,23 +311,29 @@ paths:
   /auth/logout:
     post:
       tags: [Auth]
-      summary: Cerrar sesión (client-side)
+      summary: Cerrar sesión
+      description: |
+        El logout en esta arquitectura es **client-side**: el servidor no invalida el token
+        (no hay blacklist). El cliente debe eliminar el JWT de su almacenamiento local.
+        Este endpoint confirma la acción para que el frontend pueda proceder.
       security: [{ bearerAuth: [] }]
       responses:
         "200":
-          description: Instrucción de logout enviada
+          description: Confirmación de logout enviada
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  success: { type: boolean }
-                  message: { type: string }
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "401":
+          description: Token inválido
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /auth/change-password:
     post:
       tags: [Auth]
-      summary: Cambiar contraseña
+      summary: Cambiar contraseña del usuario autenticado
+      description: Requiere la contraseña actual para confirmar la identidad antes de cambiarla.
       security: [{ bearerAuth: [] }]
       requestBody:
         required: true
@@ -201,77 +343,217 @@ paths:
               type: object
               required: [current_password, new_password, new_password_confirm]
               properties:
-                current_password:     { type: string }
-                new_password:         { type: string, minLength: 8 }
-                new_password_confirm: { type: string }
+                current_password:     { type: string, example: "miPasswordViejo" }
+                new_password:         { type: string, minLength: 8, example: "miPasswordNuevo123" }
+                new_password_confirm: { type: string, example: "miPasswordNuevo123" }
       responses:
         "200":
-          description: Contraseña actualizada
+          description: Contraseña actualizada correctamente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: Campos faltantes o contraseñas nuevas no coinciden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
         "401":
-          description: Contraseña actual incorrecta
+          description: Contraseña actual incorrecta o token inválido
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  # ---------------- DASHBOARDS ------------------------------------------
+  # ========================================================================
+  # DASHBOARDS
+  # ========================================================================
+
   /dashboards:
     get:
       tags: [Dashboards]
-      summary: Listar todos los dashboards
+      summary: Listar todos los dashboards (eventos)
+      description: Devuelve todos los hackathons registrados con el conteo de proyectos de cada uno. Público.
       responses:
         "200":
-          description: Lista de dashboards
+          description: Lista de dashboards ordenada por fecha de creación descendente
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Dashboard" }
+        "500":
+          description: Error al obtener dashboards
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /dashboard/get:
     get:
       tags: [Dashboards]
-      summary: Obtener un dashboard por slug
+      summary: Obtener un dashboard por slug con sus proyectos
+      description: Devuelve los datos del dashboard más la lista de proyectos asociados. Público.
       parameters:
         - name: slug
           in: query
           required: true
+          description: Identificador único del dashboard
           schema: { type: string, example: "hola" }
       responses:
         "200":
-          description: Dashboard encontrado
+          description: Dashboard encontrado con sus proyectos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:   { type: boolean, example: true }
+                  dashboard:
+                    allOf:
+                      - { $ref: "#/components/schemas/Dashboard" }
+                      - type: object
+                        properties:
+                          projects:
+                            type: array
+                            items: { $ref: "#/components/schemas/Project" }
+        "400":
+          description: Slug no proporcionado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
         "404":
-          description: No encontrado
+          description: Dashboard no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /dashboard/create:
     post:
       tags: [Dashboards]
-      summary: Crear dashboard
+      summary: Crear nuevo dashboard
+      description: |
+        Solo accesible para usuarios con rol `admin`.
+        El slug se genera automáticamente a partir del título (slugify).
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
-              required: [title, slug]
+              required: [title, description]
               properties:
-                title:       { type: string }
-                slug:        { type: string }
-                description: { type: string }
-                color:       { type: string }
+                title:       { type: string, example: "AIWKND San Rafael 2026" }
+                description: { type: string, example: "Hackathon de IA — Mayo 2026" }
+                color:       { type: string, enum: [blue, green, purple, red, orange, yellow, pink, indigo], example: "blue" }
       responses:
-        "201": { description: Creado }
+        "201":
+          description: Dashboard creado. Devuelve el slug generado automáticamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string }
+                  slug:    { type: string, example: "aiwknd-san-rafael-2026" }
+        "400":
+          description: Faltan título o descripción
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "403":
+          description: El usuario no tiene rol admin
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  # ---------------- PROJECTS --------------------------------------------
+  /dashboard/update:
+    post:
+      tags: [Dashboards]
+      summary: Actualizar un dashboard
+      description: Solo accesible para usuarios con rol `admin`.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slug, title, description]
+              properties:
+                slug:        { type: string, example: "hola" }
+                title:       { type: string, example: "Nuevo Título" }
+                description: { type: string }
+                color:       { type: string, enum: [blue, green, purple, red, orange, yellow, pink, indigo] }
+      responses:
+        "200":
+          description: Dashboard actualizado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "403":
+          description: Sin permisos de admin
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "500":
+          description: Error al actualizar o slug no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /dashboard/delete:
+    post:
+      tags: [Dashboards]
+      summary: Eliminar un dashboard
+      description: |
+        Solo accesible para usuarios con rol `admin`.
+        **Ojo:** La eliminación en cascada borra también todos los proyectos, tareas, miembros y solicitudes asociadas.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slug]
+              properties:
+                slug: { type: string, example: "hola" }
+      responses:
+        "200":
+          description: Dashboard eliminado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: Slug no proporcionado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "403":
+          description: Sin permisos de admin
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ========================================================================
+  # PROJECTS
+  # ========================================================================
+
   /project/getProjects:
     get:
       tags: [Projects]
       summary: Listar proyectos de un dashboard
+      description: Devuelve todos los proyectos del dashboard indicado. Público.
       parameters:
         - name: slug
           in: query
           required: true
-          schema: { type: string }
+          description: Slug del dashboard
+          schema: { type: string, example: "hola" }
       responses:
         "200":
           description: Lista de proyectos
@@ -280,129 +562,866 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: { type: boolean }
+                  success: { type: boolean, example: true }
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Project" }
+        "400":
+          description: Slug no proporcionado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /project/get:
     get:
       tags: [Projects]
       summary: Obtener un proyecto por ID
+      description: Público. Devuelve los datos completos de un proyecto incluido el slug del dashboard.
       parameters:
         - name: id
           in: query
           required: true
-          schema: { type: integer }
+          description: ID del proyecto
+          schema: { type: integer, example: 54 }
       responses:
-        "200": { description: Proyecto }
-        "404": { description: No encontrado }
+        "200":
+          description: Proyecto encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  project: { $ref: "#/components/schemas/Project" }
+        "400":
+          description: ID no proporcionado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Proyecto no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /project/create:
     post:
       tags: [Projects]
-      summary: Crear proyecto
+      summary: Crear un nuevo proyecto
+      description: |
+        Requiere JWT. El usuario autenticado queda registrado como `created_by_user_id`.
+        Acepta `multipart/form-data` para permitir la subida de imagen.
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
               type: object
               required: [title, description, slug]
               properties:
-                title:        { type: string }
-                description:  { type: string }
-                slug:         { type: string }
-                status:       { type: string, enum: [in_progress, completed] }
-                group_name:   { type: string }
-                link_video:   { type: string }
-                link_deploy:  { type: string }
-                members_data: { type: string }
-                pitch:        { type: string }
-                image:        { type: string, format: binary }
+                title:       { type: string,  example: "Mi Proyecto IA" }
+                description: { type: string,  example: "Descripción del proyecto." }
+                slug:        { type: string,  example: "hola", description: "Slug del dashboard al que pertenece" }
+                status:      { type: string,  enum: [in_progress, completed], default: "in_progress" }
+                pitch:       { type: string,  example: "Elevator pitch de 1 línea." }
+                group_name:  { type: string,  example: "Grupo Alpha" }
+                link_video:  { type: string,  format: uri, example: "https://youtu.be/xyz" }
+                link_deploy: { type: string,  format: uri, example: "https://miapp.vercel.app" }
+                image:       { type: string,  format: binary, description: "Imagen del proyecto (JPG/PNG)" }
       responses:
-        "201": { description: Proyecto creado }
+        "201":
+          description: Proyecto creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:    { type: boolean, example: true }
+                  message:    { type: string }
+                  project_id: { type: integer, example: 55 }
+        "400":
+          description: Faltan campos requeridos
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          description: Token inválido o ausente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "500":
+          description: Error al crear el proyecto (ej. dashboard no encontrado)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /project/update:
+    post:
+      tags: [Projects]
+      summary: Actualizar un proyecto
+      description: |
+        Requiere JWT. Solo puede editar el **creador del proyecto** o un usuario con rol `admin`.
+        Acepta `multipart/form-data` para permitir actualizar la imagen.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id:          { type: integer, example: 54 }
+                title:       { type: string }
+                description: { type: string }
+                status:      { type: string, enum: [in_progress, completed] }
+                pitch:       { type: string }
+                group_name:  { type: string }
+                link_video:  { type: string, format: uri }
+                link_deploy: { type: string, format: uri }
+                image:       { type: string, format: binary }
+      responses:
+        "200":
+          description: Proyecto actualizado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "403":
+          description: Sin permiso para editar este proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Proyecto no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /project/delete:
+    post:
+      tags: [Projects]
+      summary: Eliminar un proyecto
+      description: |
+        Requiere JWT. Solo puede eliminar el **creador del proyecto** o un usuario con rol `admin`.
+        Elimina en cascada: miembros, tareas, solicitudes y archivos del proyecto.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Proyecto eliminado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "403":
+          description: Sin permiso para eliminar este proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Proyecto no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /project/stats:
+    get:
+      tags: [Projects]
+      summary: Estadísticas de un proyecto
+      description: Devuelve progreso, total de tareas, tareas completadas y total de miembros.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Estadísticas del proyecto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  stats:
+                    type: object
+                    properties:
+                      progress:        { type: integer, example: 60 }
+                      total_tasks:     { type: integer, example: 5 }
+                      completed_tasks: { type: integer, example: 3 }
+                      total_members:   { type: integer, example: 4 }
+                      total_files:     { type: integer, example: 0 }
+
+  /project/members:
+    get:
+      tags: [Projects]
+      summary: Obtener miembros de un proyecto
+      description: Devuelve la lista de integrantes del proyecto. Público.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID del proyecto
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Lista de miembros
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  members:
+                    type: array
+                    items: { $ref: "#/components/schemas/ProjectMember" }
+
+  /project/tasks:
+    get:
+      tags: [Projects]
+      summary: Obtener tareas de un proyecto
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Lista de tareas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  tasks:
+                    type: array
+                    items: { $ref: "#/components/schemas/Task" }
+
+  /project/files:
+    get:
+      tags: [Projects]
+      summary: Obtener archivos de un proyecto
+      description: Actualmente devuelve array vacío (funcionalidad en desarrollo).
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Lista de archivos (pendiente de implementación)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  files:   { type: array, items: {}, example: [] }
+
+  /project/activity:
+    get:
+      tags: [Projects]
+      summary: Obtener actividad de un proyecto
+      description: Actualmente devuelve array vacío (funcionalidad en desarrollo).
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Registro de actividad (pendiente de implementación)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:  { type: boolean }
+                  activity: { type: array, items: {}, example: [] }
+
+  /project/getFollowedProjects:
+    get:
+      tags: [Projects]
+      summary: Proyectos seguidos por el usuario autenticado
+      description: Devuelve los proyectos en los que el usuario tiene alguna solicitud (pendiente, aprobada o rechazada).
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Lista de proyectos seguidos con el estado de la solicitud
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:  { type: boolean, example: true }
+                  projects:
+                    type: array
+                    items: { $ref: "#/components/schemas/FollowedProject" }
+        "401":
+          description: Token inválido o ausente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ========================================================================
+  # JOIN REQUESTS
+  # ========================================================================
 
   /project/sendJoinRequest:
     post:
-      tags: [Projects]
+      tags: [Join Requests]
       summary: Solicitar unirse a un proyecto
+      description: |
+        El usuario autenticado envía una solicitud para unirse al proyecto indicado.
+        No se puede enviar una solicitud duplicada mientras haya una pendiente.
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               required: [project_id]
               properties:
-                project_id: { type: integer }
+                project_id: { type: integer, example: 54 }
       responses:
-        "200": { description: Solicitud enviada }
+        "201":
+          description: Solicitud enviada correctamente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: ID faltante o solicitud duplicada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          description: Token inválido o ausente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /project/getJoinRequests:
+    get:
+      tags: [Join Requests]
+      summary: Ver solicitudes pendientes de un proyecto
+      description: |
+        Solo puede acceder el **creador del proyecto** o un `admin`.
+        Devuelve las solicitudes con estado `pending`.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: project_id
+          in: query
+          required: true
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Lista de solicitudes pendientes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:  { type: boolean, example: true }
+                  requests:
+                    type: array
+                    items: { $ref: "#/components/schemas/JoinRequest" }
+        "403":
+          description: Sin permisos para ver las solicitudes de este proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /project/approveJoinRequest:
     post:
-      tags: [Projects]
-      summary: Aprobar solicitud de unión
+      tags: [Join Requests]
+      summary: Aprobar una solicitud de unión
+      description: |
+        Solo puede aprobar el **creador del proyecto** o un `admin`.
+        Al aprobar, el usuario queda añadido como `member` en `project_members`.
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               required: [request_id]
               properties:
-                request_id: { type: integer }
+                request_id: { type: integer, example: 5 }
       responses:
-        "200": { description: Aprobada }
+        "200":
+          description: Solicitud aprobada y usuario añadido al equipo
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "403":
+          description: Sin permisos para aprobar solicitudes en este proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Solicitud no encontrada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /project/rejectJoinRequest:
     post:
-      tags: [Projects]
-      summary: Rechazar solicitud de unión
+      tags: [Join Requests]
+      summary: Rechazar una solicitud de unión
+      description: Solo puede rechazar el **creador del proyecto** o un `admin`.
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               required: [request_id]
               properties:
-                request_id: { type: integer }
+                request_id: { type: integer, example: 5 }
       responses:
-        "200": { description: Rechazada }
+        "200":
+          description: Solicitud rechazada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "403":
+          description: Sin permisos para rechazar solicitudes en este proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Solicitud no encontrada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  # ---------------- TASKS -----------------------------------------------
-  /task/create:
+  /project/removeMember:
     post:
-      tags: [Tasks]
-      summary: Crear tarea
+      tags: [Join Requests]
+      summary: Expulsar a un miembro del proyecto
+      description: |
+        Solo puede expulsar el **creador del proyecto** o un `admin`.
+        No se puede expulsar al propio creador del proyecto.
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
-              required: [project_id, title]
+              required: [project_id, user_id]
               properties:
-                project_id:  { type: integer }
+                project_id: { type: integer, example: 54 }
+                user_id:    { type: integer, example: 3 }
+      responses:
+        "200":
+          description: Miembro expulsado correctamente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: No se puede expulsar al creador del proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "403":
+          description: Sin permisos para expulsar miembros de este proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Proyecto no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ========================================================================
+  # MEMBERS (rutas legacy del MemberController)
+  # ========================================================================
+
+  /member/getAll:
+    get:
+      tags: [Members]
+      summary: Listar todos los miembros del sistema
+      description: Devuelve todos los registros de `project_members` sin filtro. Público.
+      responses:
+        "200":
+          description: Lista completa de miembros
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ProjectMember" }
+
+  /member/createMember:
+    post:
+      tags: [Members]
+      summary: Añadir miembro a un proyecto directamente
+      description: |
+        Requiere JWT. Añade un usuario a un proyecto por su nombre y email (sin pasar por solicitud).
+        Útil para el admin o el creador del proyecto para agregar miembros manualmente.
+        Un usuario no puede pertenecer a más de un proyecto simultáneamente.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [name, email]
+              properties:
+                name:       { type: string,  example: "Usuario Generico" }
+                email:      { type: string,  format: email, example: "usuario@demo.com" }
+                project_id: { type: integer, example: 54 }
+                role:       { type: string,  enum: [owner, admin, member], default: "member" }
+      responses:
+        "201":
+          description: Miembro añadido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:   { type: boolean, example: true }
+                  message:   { type: string }
+                  member_id: { type: integer, example: 7 }
+        "400":
+          description: Faltan datos requeridos
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "403":
+          description: El usuario ya pertenece a otro proyecto
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /member/delete:
+    post:
+      tags: [Members]
+      summary: Eliminar miembro de un proyecto
+      description: Requiere JWT. Elimina a un miembro identificado por su email y el ID del proyecto.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, project_id]
+              properties:
+                email:      { type: string,  format: email, example: "usuario@demo.com" }
+                project_id: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Miembro eliminado exitosamente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: Email o project_id faltante
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "500":
+          description: Error al eliminar (miembro no encontrado en ese proyecto)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ========================================================================
+  # TASKS
+  # ========================================================================
+
+  /task/create:
+    post:
+      tags: [Tasks]
+      summary: Crear una tarea en un proyecto
+      description: Requiere JWT. Crea una tarea asociada al proyecto indicado.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [project_id, title, description, due_date]
+              properties:
+                project_id:  { type: integer, example: 54 }
+                title:       { type: string,  example: "Implementar auth" }
+                description: { type: string,  example: "Crear el AuthController y UserModel." }
+                priority:    { type: string,  enum: [low, medium, high], default: "medium" }
+                assigned_to: { type: string,  example: "Usuario Generico" }
+                due_date:    { type: string,  format: date, example: "2026-04-30" }
+      responses:
+        "201":
+          description: Tarea creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string }
+                  task_id: { type: integer, example: 6 }
+        "400":
+          description: Faltan datos requeridos
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: Proyecto no encontrado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /task/getTasks:
+    get:
+      tags: [Tasks]
+      summary: Listar tareas de un proyecto
+      description: Requiere JWT.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID del proyecto
+          schema: { type: integer, example: 54 }
+      responses:
+        "200":
+          description: Lista de tareas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  tasks:
+                    type: array
+                    items: { $ref: "#/components/schemas/Task" }
+
+  /task/get:
+    get:
+      tags: [Tasks]
+      summary: Obtener una tarea por ID
+      description: Requiere JWT.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID de la tarea
+          schema: { type: integer, example: 1 }
+      responses:
+        "200":
+          description: Tarea encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  task:    { $ref: "#/components/schemas/Task" }
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /task/update:
+    post:
+      tags: [Tasks]
+      summary: Actualizar una tarea
+      description: Requiere JWT.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [task_id, title, description, due_date]
+              properties:
+                task_id:     { type: integer, example: 1 }
                 title:       { type: string }
                 description: { type: string }
+                priority:    { type: string, enum: [low, medium, high] }
+                assigned_to: { type: string }
+                due_date:    { type: string, format: date }
+                status:      { type: string, enum: [pending, in_progress, completed] }
       responses:
-        "201": { description: Tarea creada }
+        "200":
+          description: Tarea actualizada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "500":
+          description: Error al actualizar o tarea no encontrada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /task/delete:
+    post:
+      tags: [Tasks]
+      summary: Eliminar una tarea
+      description: Requiere JWT.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id: { type: integer, example: 1 }
+      responses:
+        "200":
+          description: Tarea eliminada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: ID no proporcionado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /task/updateStatus:
     post:
       tags: [Tasks]
-      summary: Cambiar estado de una tarea
+      summary: Actualizar solo el estado de una tarea
+      description: Requiere JWT. Endpoint rápido para cambiar el estado sin tocar los demás campos.
       security: [{ bearerAuth: [] }]
       requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [task_id, status]
+              properties:
+                task_id: { type: integer, example: 1 }
+                status:  { type: string,  enum: [pending, in_progress, completed] }
+      responses:
+        "200":
+          description: Estado actualizado exitosamente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: Estado inválido o campos faltantes
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  # ========================================================================
+  # ADMIN (Super Admin only)
+  # ========================================================================
+
+  /admin/users:
+    get:
+      tags: [Admin]
+      summary: Listar todos los usuarios registrados
+      description: |
+        **Exclusivo para `admin`.** Devuelve el listado completo de usuarios sin exponer el `password_hash`.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Lista de usuarios ordenada por fecha de creación descendente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/User" }
+        "403":
+          description: El usuario no tiene rol admin
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/changeRole:
+    post:
+      tags: [Admin]
+      summary: Cambiar el rol de un usuario
+      description: |
+        **Exclusivo para `admin`.** Permite promover a `admin` o degradar a `user`.
+        Un admin no puede cambiar su propio rol para evitar errores accidentales.
+        Roles válidos: `user`, `admin`.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
-              required: [id, status]
+              required: [user_id, role]
               properties:
-                id:     { type: integer }
-                status: { type: string, enum: [pending, in_progress, completed] }
+                user_id: { type: integer, example: 3 }
+                role:    { type: string,  enum: [user, admin], example: "admin" }
       responses:
-        "200": { description: Estado actualizado }
+        "200":
+          description: Rol actualizado correctamente
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuccessResponse" }
+        "400":
+          description: Faltan user_id o role
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "403":
+          description: Sin permisos de admin, o intento de cambiar el propio rol
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "500":
+          description: Error al cambiar rol (rol inválido)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/stats:
+    get:
+      tags: [Admin]
+      summary: Estadísticas globales del sistema
+      description: |
+        **Exclusivo para `admin`.** Devuelve métricas globales para el panel de administración:
+        total de usuarios, admins, dashboards y proyectos.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Estadísticas globales
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data:    { $ref: "#/components/schemas/AdminStats" }
+        "403":
+          description: Sin permisos de admin
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }

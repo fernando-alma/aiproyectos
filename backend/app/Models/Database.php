@@ -15,7 +15,16 @@ class Database
         // Leemos las variables del .env de forma directa y limpia
         // Si no existen, usamos valores por defecto seguros para local
         $host = $_ENV['DB_HOST'] ?? 'localhost';
-        $db   = $_ENV['DB_NAME'] ?? 'aiproyectos';
+        
+        // Verificamos por la variable de entorno o por el Header que Guzzle inyecta
+        $isTesting = ($_ENV['APP_ENV'] ?? '') === 'testing' || ($_SERVER['HTTP_X_TESTING_MODE'] ?? '0') === '1';
+
+        if ($isTesting) {
+            $db = 'aiproyectos_test';
+        } else {
+            $db = $_ENV['DB_NAME'] ?? 'aiproyectos';
+        }
+        
         $user = $_ENV['DB_USER'] ?? 'root';
         $pass = $_ENV['DB_PASS'] ?? '';
         $port = $_ENV['DB_PORT'] ?? '3306';

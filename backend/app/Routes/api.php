@@ -14,7 +14,7 @@ return [
     // --- AUTENTICACIÓN (Públicas) ---
     'auth/register'         => ['controller' => AuthController::class, 'method' => 'register',       'httpMethod' => 'POST'],
     'auth/login'            => ['controller' => AuthController::class, 'method' => 'login',          'httpMethod' => 'POST'],
-    'login'                 => ['controller' => AuthController::class, 'method' => 'login',          'httpMethod' => 'POST'], // Legacy compat
+
 
     // --- AUTENTICACIÓN (Protegidas) ---
     'auth/logout'           => ['controller' => AuthController::class, 'method' => 'logout',         'httpMethod' => 'POST', 'protected' => true],
@@ -39,7 +39,7 @@ return [
     'project/members'             => ['controller' => ProjectController::class, 'method' => 'getMembers',       'httpMethod' => 'GET'],
     'project/tasks'               => ['controller' => ProjectController::class, 'method' => 'getTasks',         'httpMethod' => 'GET'],
     'project/activity'            => ['controller' => ProjectController::class, 'method' => 'getActivity',      'httpMethod' => 'GET'],
-    'project/createProjectMember' => ['controller' => ProjectController::class, 'method' => 'createProjectsMember', 'httpMethod' => 'POST', 'protected' => true],
+
     'project/sendJoinRequest'     => ['controller' => ProjectController::class, 'method' => 'sendJoinRequest',  'httpMethod' => 'POST', 'protected' => true],
     'project/getJoinRequests'     => ['controller' => ProjectController::class, 'method' => 'getJoinRequests',  'httpMethod' => 'GET',  'protected' => true],
     'project/approveJoinRequest'  => ['controller' => ProjectController::class, 'method' => 'approveJoinRequest', 'httpMethod' => 'POST', 'protected' => true],

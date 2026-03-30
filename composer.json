@@ -2,6 +2,10 @@
     "require": {
         "vlucas/phpdotenv": "^5.6"
     },
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "guzzlehttp/guzzle": "*"
+    },
     "autoload": {
         "psr-4": {
             "App\\Models\\": "frontend/models/",
@@ -9,6 +13,11 @@
             "App\\Backend\\Models\\": "backend/app/Models/",
             "App\\Backend\\": "backend/app/",
             "App\\Frontend\\": "frontend/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
         }
     }
 }
