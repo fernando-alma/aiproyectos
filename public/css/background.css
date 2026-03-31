@@ -1,0 +1,57 @@
+#animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -999;
+    background-color: var(--bg-dark);
+    overflow: hidden;
+    pointer-events: none; /* Evita que el fondo bloquee interacciones */
+}
+
+/* Orbes Base */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.4;
+    transition: transform 0.3s ease-out;
+}
+
+/* Orbe 1 - Pink (Sigue suavemente el mouse) */
+.orb-1 {
+    width: 500px;
+    height: 500px;
+    background: var(--aiw-pink);
+    top: -100px;
+    left: -100px;
+}
+
+/* Orbe 2 - Purple (Efecto opuesto al mouse) */
+.orb-2 {
+    width: 600px;
+    height: 600px;
+    background: var(--aiw-purple);
+    bottom: -150px;
+    right: -100px;
+}
+
+/* Orbe 3 - Cyan (Animado por CSS flotando) */
+.orb-3 {
+    width: 400px;
+    height: 400px;
+    background: var(--aiw-cyan);
+    top: 30%;
+    left: 40%;
+    animation: floatOrb 8s infinite alternate ease-in-out;
+}
+
+@keyframes floatOrb {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        transform: translate(50px, -50px) scale(1.1);
+    }
+}

@@ -59,6 +59,7 @@ body {
   width: min(1200px, 100%);
   max-width: 1200px;
   padding: clamp(1rem, 3vw, 2rem);
+  padding-top: 100px;
   min-height: 100dvh;
   display: grid;
   align-items: center;

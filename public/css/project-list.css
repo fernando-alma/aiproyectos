@@ -134,7 +134,7 @@ body {
   display: grid;
   height: 100%;
   margin: 5rem auto;
-  padding: 0 1rem;
+  padding: 100px 1rem 0;
 }
 
 .projects-title {

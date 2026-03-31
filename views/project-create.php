@@ -10,11 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="public/css/nav-styles.css">
+    <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/project-create.css">
     <link rel="stylesheet" href="public/css/footer.css"> 
 </head>
 
 <body class="create-project-page">
+    <?php require_once("components/nav.php"); ?>
     <main class="main-content">
         <section class="form-section">
             <div class="form-container">

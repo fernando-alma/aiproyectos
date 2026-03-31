@@ -30,7 +30,7 @@ body.create-project-page {
    LAYOUT & CONTENEDOR
    ========================================= */
 .main-content {
-    padding: 40px 20px;
+    padding: 100px 20px 40px;
     min-height: calc(100vh - 150px); /* Ajuste para footer/nav */
     display: flex;
     justify-content: center;

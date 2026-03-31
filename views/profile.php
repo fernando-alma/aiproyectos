@@ -4,32 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil</title>
+    <link rel="stylesheet" href="public/css/nav-styles.css">
+    <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/account.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="public/css/footer.css"> 
 </head>
 <body>
-        <header class="header">
-            <div class="header-left">
-                <img src="public/images/AIWKND-negro-solo.png" alt="AIWKND" class="logo">
-                <nav class="desktop-nav">
-                    <a href="index" class="nav-link">
-                        <span class="nav-icon"></span>
-                        <span class="nav-text">Inicio</span>
-                    </a>
-                    <a href="project-list" class="nav-link">
-                        <span class="nav-icon"></span>
-                        <span class="nav-text">Proyectos</span>
-                    </a>
-                </nav>
-            </div>
-            <nav class="desktop-nav-right">
-                <a href="profile" class="nav-link">
-                    <span class="nav-icon"></span>
-                    <span class="nav-text">Cuenta</span>
-                </a>
-            </nav>
-        </header>
+    <?php require_once("components/nav.php"); ?>
+
 
     <div class="profile-page-container">
         <main class="profile-content">
@@ -75,7 +58,6 @@
             </div>
         </div>
         
-    <?php require_once("components/nav.php"); ?>
     <?php require_once ("components/footer.php"); ?> 
     
     <script src="public/js/session-check.js"></script>

@@ -4,32 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restablecer contraseña</title>
+    <link rel="stylesheet" href="public/css/nav-styles.css">
+    <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/recover-password.css">
     <link rel="stylesheet" href="public/css/footer.css"> 
 </head>
 <body>
+    <?php require_once("components/nav.php"); ?>
     <div class="container">
-        <header class="header">
-            <div class="header-left">
-                <img src="public/images/AIWKND-negro-solo.png" alt="AIWKND" class="logo">
-                <nav class="desktop-nav">
-                    <a href="index" class="nav-link">
-                        <span class="nav-icon"></span>
-                        <span class="nav-text">Inicio</span>
-                    </a>
-                    <a href="project-list" class="nav-link">
-                        <span class="nav-icon"></span>
-                        <span class="nav-text">Proyectos</span>
-                    </a>
-                </nav>
-            </div>
-            <nav class="desktop-nav-right">
-                <a href="profile" class="nav-link">
-                    <span class="nav-icon"></span>
-                    <span class="nav-text">Cuenta</span>
-                </a>
-            </nav>
-        </header>
+
         
         <section class="form-section">
         <div class="form-container">
@@ -50,12 +33,8 @@
         </div>
     </section>
 
-        <!-- Desktop Bottom Nav -->
-        <nav class="desktop-bottom-nav">
-            <img src="public/images/AIWKND-negro-solo.png" alt="AIWKND" class="desktop-bottom-logo">
-        </nav>
+
         
-        <?php require_once("components/nav.php"); ?>
         <?php require_once ("components/footer.php"); ?>
     </div>
     <script src="public/js/config.js"></script>

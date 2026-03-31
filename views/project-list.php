@@ -6,11 +6,12 @@
     <title>Proyectos</title>
     
     <link rel="stylesheet" href="public/css/nav-styles.css">
+    <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/project-list.css"> 
     <link rel="stylesheet" href="public/css/footer.css"> 
 </head>
 <body>
-
+    <?php require_once("components/nav.php"); ?>
     <section class="projects-section">
         <div class="projects-container container"> 
             <h1 class="projects-title section-title">Catálogo de Proyectos</h1>
@@ -38,7 +39,6 @@
         </div>
     </section>
 
-    <?php require_once("components/nav.php"); ?>
     <?php require_once ("components/footer.php"); ?> 
 
     <script src="public/js/project-list.js"></script>
