@@ -3,48 +3,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileAuthContainer = document.getElementById('mobile-auth-links');
     
     function renderAuthLinks() {
-        const token = localStorage.getItem('jwt_token');
+        // En lugar de leer el jwt_token local, leemos el global provisto por session-check
+        const isLogged = window.isAuthenticated ? window.isAuthenticated() : !!localStorage.getItem('token');
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        
         let dHtml = '';
         let mHtml = '';
         
-        if (!token) {
+        if (!isLogged) {
             dHtml = `
-                <a href="login" class="bottom-nav-item" style="color: white; text-decoration: none; font-weight: 500;">Iniciar Sesión</a>
-                <a href="register" class="aiw-btn btn-gradient">Regístrate gratis</a>
+                <a href="login" class="bottom-nav-item"><span>Iniciar sesión</span></a>
+                <a href="register" class="register-button nav-button">Regístrate gratis</a>
             `;
             mHtml = `
-                <a href="login" class="aiw-btn btn-outline btn-full">Iniciar Sesión</a>
-                <a href="register" class="aiw-btn btn-gradient btn-full">Regístrate gratis</a>
+                <a href="login" class="register-button nav-button" style="text-align: center; background: transparent; border: 1px solid rgba(255,255,255,0.4);">Iniciar sesión</a>
+                <a href="register" class="register-button nav-button" style="text-align: center;">Regístrate gratis</a>
             `;
         } else {
             let role = 'user';
             
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-                const payload = JSON.parse(jsonPayload);
-                if (payload.data?.role) role = payload.data.role;
-                else if (payload.role) role = payload.role;
-            } catch (error) { console.error("Error decodificando JWT:", error); }
+            if (token) {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                    const payload = JSON.parse(jsonPayload);
+                    if (payload.data?.role) role = payload.data.role;
+                    else if (payload.role) role = payload.role;
+                } catch (error) { console.error("Error decodificando JWT:", error); }
+            }
+            
+            const userData = window.getUserData ? window.getUserData() : { userName: localStorage.getItem("userName") };
+            const firstName = userData.userName ? userData.userName.split(" ")[0] : "Usuario";
             
             let adminLinkD = '';
             let adminLinkM = '';
             if (role === 'admin' || role === 'superadmin') {
-                adminLinkD = `<a href="admin-panel" class="bottom-nav-item" style="color: var(--aiw-cyan); text-decoration:none; font-weight:500;">Panel Admin</a>`;
-                adminLinkM = `<a href="admin-panel" class="aiw-btn btn-outline btn-full" style="color: var(--aiw-cyan); border-color: rgba(0,245,234,0.3);">💎 Panel Admin</a>`;
+                adminLinkD = `<a href="admin-panel" class="bottom-nav-item"><span style="color: var(--aiw-cyan);">Panel Súper Admin</span></a>`;
+                adminLinkM = `<a href="admin-panel" class="bottom-nav-item"><span style="color: var(--aiw-cyan);">⭐ Panel Súper Admin</span></a>`;
             }
             
             dHtml = `
+                <div style="display: flex; align-items: center; gap: 8px; color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--aiw-pink)"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span style="font-weight: 600;">Hola ${firstName}!</span>
+                </div>
                 ${adminLinkD}
-                <a href="profile" class="bottom-nav-item" style="text-decoration:none; color:white; font-weight:500;">Mi Perfil</a>
-                <a href="#" onclick="logoutUser(event)" class="bottom-nav-item" style="text-decoration:none; color: var(--aiw-pink); font-weight:500;">Cerrar Sesión</a>
+                <a href="profile" class="bottom-nav-item"><span>Mi Perfil</span></a>
+                <a href="#" onclick="logoutUser(event)" class="bottom-nav-item"><span style="color: rgba(255,100,100,0.8);">Cerrar Sesión</span></a>
             `;
             
             mHtml = `
+                <div style="display: flex; align-items: center; gap: 8px; color: white; margin-bottom: 10px; padding: 0 16px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--aiw-pink)"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span style="font-weight: 600;">Hola ${firstName}!</span>
+                </div>
                 ${adminLinkM}
-                <a href="profile" class="aiw-btn btn-outline btn-full">🙋‍♂️ Mi Perfil</a>
-                <a href="#" onclick="logoutUser(event)" class="aiw-btn btn-outline btn-full" style="color: var(--aiw-pink); border-color: rgba(237,30,121,0.3);">🔴 Cerrar Sesión</a>
+                <a href="profile" class="bottom-nav-item"><span>Mi Perfil</span></a>
+                <a href="#" onclick="logoutUser(event)" class="bottom-nav-item"><span style="color: rgba(255,100,100,0.8);">Cerrar Sesión</span></a>
             `;
         }
         
@@ -57,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.logoutUser = function(e) {
     if(e) e.preventDefault();
-    localStorage.removeItem('jwt_token');
-    window.location.href = 'login';
+    if(window.logout) {
+        window.logout(); // Usa el engine seguro de session-check
+    } else {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'login';
+    }
 };

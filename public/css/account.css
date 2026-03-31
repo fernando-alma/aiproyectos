@@ -10,27 +10,14 @@
 html, body {
     height: 100%;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    background: #000000;
+    background: transparent;
     color: white;
     overflow-x: hidden;
 }
 
-body {
-    background: linear-gradient(160deg,#480a9a 0%,#8c1477 42%,#5a2068 68%,#372659 100%);
-    min-height: 100vh;
-}
-
 /* Container principal para perfil */
 .profile-page-container {
-    max-width: 414px;
-    width: 100%;
-    margin: 0 auto;
-    min-height: 100vh;
-    background: linear-gradient(160deg,#480a9a 0%,#8c1477 42%,#5a2068 68%,#372659 100%);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    padding-top: 100px;
+    background: transparent;
 }
 
 /* Header */

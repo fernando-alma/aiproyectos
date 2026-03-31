@@ -24,7 +24,7 @@
   }
 
   function clearSession() {
-    ["token","userLoggedIn","userId","userEmail","userName","userProjectMemberships"].forEach(k => {
+    ["token","userLoggedIn","userId","userEmail","userName","userProjectMemberships","loginTimestamp"].forEach(k => {
       localStorage.removeItem(k);
       sessionStorage.removeItem(k);
     });
@@ -80,12 +80,32 @@
     return PUBLIC_PAGES.some((p) => path.includes(p));
   }
 
+  const SESSION_LIMIT_MS = 5 * 60 * 60 * 1000; // 5 hours
+
   async function checkSession() {
     // Si están en login/register pero ya están logueados, sacarlos de ahí
     const path = window.location.pathname;
     if ((path.includes("/login") || path.includes("/register")) && isUserLoggedIn()) {
+        sessionStorage.setItem("showWelcomeToast", "true");
         window.location.replace("project-list");
         return;
+    }
+
+    // Gestionar tiempo de sesión
+    if (isUserLoggedIn()) {
+      let loginTimestamp = localStorage.getItem("loginTimestamp") || sessionStorage.getItem("loginTimestamp");
+      if (!loginTimestamp) {
+        loginTimestamp = Date.now().toString();
+        if (localStorage.getItem("token")) localStorage.setItem("loginTimestamp", loginTimestamp);
+        else sessionStorage.setItem("loginTimestamp", loginTimestamp);
+      }
+
+      if (Date.now() - parseInt(loginTimestamp) > SESSION_LIMIT_MS) {
+        clearSession();
+        sessionStorage.setItem("sessionExpired", "true");
+        window.location.replace("login");
+        return;
+      }
     }
 
     if (isPublicPage()) return;
@@ -102,7 +122,26 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", checkSession);
+  document.addEventListener("DOMContentLoaded", () => {
+    checkSession();
+
+    // Toasts asíncronos en cambios de página
+    if (sessionStorage.getItem("showWelcomeToast") === "true") {
+      sessionStorage.removeItem("showWelcomeToast");
+      const { userName } = getUserData();
+      const nombre = userName ? userName.split(" ")[0] : "visitante";
+      setTimeout(() => {
+        if(window.showToast) window.showToast("¡Sesión activa!", `Hola de nuevo ${nombre}, no necesitas iniciar sesión.`, "info");
+      }, 500);
+    }
+    if (sessionStorage.getItem("sessionExpired") === "true") {
+      sessionStorage.removeItem("sessionExpired");
+      setTimeout(() => {
+        if(window.showToast) window.showToast("Sesión Expirada", "Por seguridad tu sesión de 5 horas ha terminado.", "warning");
+      }, 500);
+    }
+  });
+
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) checkSession();
   });
