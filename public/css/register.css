@@ -16,7 +16,7 @@ html, body {
 }
 
 body {
-    background: linear-gradient(160deg,#480a9a 0%,#8c1477 42%,#5a2068 68%,#372659 100%);
+    background: transparent;
     min-height: 100vh;
 }
 
@@ -30,7 +30,7 @@ body {
     width: 100%;
     margin: 0 auto;
     min-height: 100vh;
-    background: linear-gradient(160deg,#480a9a 0%,#8c1477 42%,#5a2068 68%,#372659 100%);
+    background: transparent;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -212,62 +212,59 @@ body {
     margin-top: 20px;
 }
 
+.solid-dark {
+    background-color: #210d35; /* Dark solid purple */
+    border-radius: 15px;
+    padding: 40px 30px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+
 .form-group {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
 }
 
 .form-group label {
-    display: block;
-    font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    color: #ffffff;
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 8px;
-    letter-spacing: 0.5px;
+    margin-left: 5px;
+    color: #ffffff;
 }
 
-.form-group input {
+.form-input {
     width: 100%;
-    font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: 'Inter', 'Raleway', sans-serif;
     padding: 14px 18px;
-    background: transparent;
-    border: 1px solid #ffffff;
-    border-radius: 25px;
-    color: #ffffff;
+    background: #e8f0fe; /* Cajas blancas / celeste claro */
+    border: none;
+    border-radius: 8px;
+    color: #000000;
     font-size: 15px;
     transition: all 0.25s ease;
 }
 
-.form-group input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+.form-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
     font-size: 14px;
 }
 
-.form-group input:focus {
+.form-input:focus {
     outline: none;
-    border-color: #9b0993;
-    box-shadow: 0 2px 8px rgba(0, 187, 212, 0.342);
-}
-
-.form-group input:hover {
-    outline: none;
-    border-color: #9b0993;
-    box-shadow: 0 2px 8px rgba(0, 187, 212, 0.342);
+    box-shadow: 0 0 0 3px rgba(255, 0, 122, 0.3); /* Resplandor AIWKND al hacer foco */
 }
 
 /* Submit button */
 .submit-button {
-    width: auto;
-    background: linear-gradient(90deg, #ff007a, #7b2ff7);
+    width: 100%;
+    background: linear-gradient(90deg, var(--aiw-pink), var(--aiw-purple));
     color: #ffffff;
-    padding: 12px 32px;
-    font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    border-radius: 25px;
+    padding: 14px 32px;
+    font-family: 'Inter', 'Raleway', sans-serif;
+    border-radius: 12px;
     font-size: 16px;
-    font-weight: bold;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     border: 1px solid #ffffff00;
     transition: all 0.3s ease;
@@ -437,10 +434,9 @@ body {
         font-size: 24px;
     }
     
-    .form-group input {
-        width: 313px;
-        height: 37px;
-        padding: 12px 16px 12px 23px;
+    .form-input {
+        width: 100%;
+        padding: 12px 16px 12px 16px;
         font-size: 14px;
     }
     
@@ -469,10 +465,9 @@ body {
         margin-bottom: 10px;
     }
     
-    .form-group input {
-        width: 313px;
-        height: 37px;
-        padding: 10px 14px 10px 21px;
+    .form-input {
+        width: 100%;
+        padding: 10px 14px;
     }
     
     .submit-button {
@@ -574,12 +569,8 @@ body {
         text-align: center;
     }
     
-    .form-group input {
-        width: 100%;
-        padding: 12px 18px;
-        font-size: 14px;
-        border-radius: 20px;
-        margin-bottom: 15px;
+    .form-input {
+        font-size: 15px;
     }
     
     .form-group input::placeholder {
@@ -680,12 +671,8 @@ body {
         text-align: center;
     }
     
-    .form-group input {
-        width: 100%;
-        padding: 14px 20px;
+    .form-input {
         font-size: 16px;
-        border-radius: 25px;
-        margin-bottom: 20px;
     }
     
     .form-group input::placeholder {
@@ -783,12 +770,8 @@ body {
         text-align: center;
     }
     
-    .form-group input {
-        width: 100%;
-        padding: 16px 24px;
+    .form-input {
         font-size: 18px;
-        border-radius: 30px;
-        margin-bottom: 25px;
     }
     
     .form-group input::placeholder {

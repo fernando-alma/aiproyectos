@@ -15,14 +15,16 @@
 
         
         <main class="main-content">
-            <form class="login-form" id="loginForm">
-                <h1 class="page-title">Acceder</h1>
+            <form class="login-form solid-dark" id="loginForm">
+                <h1 class="page-title" style="text-align: center;">Acceder</h1>
                 <div class="form-group">
-                    <input type="email" id="username" name="username" class="form-input" placeholder="Dirección de Email" required>
+                    <label for="username">Dirección de email</label>
+                    <input type="email" id="username" name="username" class="form-input" placeholder="ejemplo@aiweekend.com" required>
                 </div>
                 
                 <div class="form-group">
-                    <input type="password" id="password" name="password" class="form-input" placeholder="Contraseña" required>
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
                 </div>
                 
                 <div class="form-group-check">

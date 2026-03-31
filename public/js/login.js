@@ -1,7 +1,7 @@
 const loginF = document.querySelector("form");
 
 // Configuración bloqueo login por intentos fallidos
-const loginBtn = document.querySelector(".login-button");
+const loginBtn = document.querySelector(".login-btn");
 let intentosFallidos = parseInt(localStorage.getItem("intentosFallidos")) || 0;
 const maxIntentos = 5;
 const bloqueoTiempo = 120; //Segundos
@@ -41,15 +41,7 @@ function actualizarMensajeBloqueo() {
 }
 
 function mostrarMensajeLogin(mensaje) {
-  const mensajeDiv = document.getElementById("mensajeLogin");
-  if (mensajeDiv) {
-    mensajeDiv.textContent = mensaje;
-    mensajeDiv.style.display = "block";
-    // Oculta el mensaje 
-    setTimeout(() => {
-      mensajeDiv.style.display = "none";
-    }, 1500);
-  }
+  window.showToast("Atención", mensaje, "info");
 }
 
 // Función de ayuda para verificar roles
@@ -74,13 +66,16 @@ loginF.addEventListener("submit", async (event) => {
   const mantenerSesion = document.querySelector("#mantenerSesion").checked;
 
   if (!username || !password) {
-    showNotification("Por favor ingresa ambos campos: usuario y contraseña.", 'error');
+    window.showToast("Datos incompletos", "Por favor ingresa ambos campos: usuario y contraseña.", 'error');
     return;
   }
 
+  loginBtn.disabled = true;
+  const originalText = loginBtn.textContent;
+  loginBtn.textContent = "Accediendo...";
+
   try {
-    // Antes de subir a producción https://systemauth.alphadocere.cl/login.php o a https://test-systemauth.alphadocere.cl/login.php
-    const response = await fetch('https://test-systemauth.alphadocere.cl/login.php', {  // endpoint local
+    const response = await fetch(CONFIG.API_BASE + 'auth/login', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,72 +89,31 @@ loginF.addEventListener("submit", async (event) => {
     const result = await response.json();
     console.log("Respuesta del servidor:", result);
 
-    if (result.success === true) {
+      if (result.success === true) {
       // Reset de intentos fallidos
       intentosFallidos = 0;
       localStorage.setItem("intentosFallidos", "0");
       localStorage.removeItem("bloqueoLoginHasta");
-      console.log("Login exitoso");
 
-      // Almacenar información del login
-      if (mantenerSesion) {
-        localStorage.setItem("userLoggedIn", "true");
-        localStorage.setItem("username", username);
-        localStorage.setItem("sessionPermanent", "true");
-        
-        // Almacenar datos adicionales del usuario si están disponibles
-        if (result.token) {
-          localStorage.setItem("token", result.token);
-        }
-        if (result.user) {
-          localStorage.setItem("userId", result.user.id);
-          localStorage.setItem("userEmail", result.user.email);
-          localStorage.setItem("userName", result.user.nombre);
-          localStorage.setItem("userCiudad", result.user.ciudad);
-        }
-        // Guardar los roles asociados al usuario si están disponibles
-        if (Array.isArray(result.roles)) {
-          localStorage.setItem("roles", JSON.stringify(result.roles));
-        }
-      } else {
-        sessionStorage.setItem("userLoggedIn", "true");
-        sessionStorage.setItem("username", username);
-        sessionStorage.setItem("sessionPermanent", "false");
-        
-        // También guardamos en localStorage como respaldo
-        localStorage.setItem("userLoggedIn", "true");
-        localStorage.setItem("username", username);
-        localStorage.setItem("sessionPermanent", "false");
-        
-        // Almacenar datos adicionales del usuario si están disponibles
-        if (result.token) {
-          sessionStorage.setItem("token", result.token);
-          localStorage.setItem("token", result.token);
-        }
-        if (result.user) {
-          sessionStorage.setItem("userId", result.user.id);
-          localStorage.setItem("userId", result.user.id);
-          sessionStorage.setItem("userEmail", result.user.email);
-          localStorage.setItem("userEmail", result.user.email);
-          sessionStorage.setItem("userName", result.user.nombre);
-          localStorage.setItem("userName", result.user.nombre);
-          sessionStorage.setItem("userCiudad", result.user.ciudad);
-          localStorage.setItem("userCiudad", result.user.ciudad);
-        }
-        // Guardar los roles asociados al usuario si están disponibles
-        if (Array.isArray(result.roles)) {
-          sessionStorage.setItem("roles", JSON.stringify(result.roles));
-          localStorage.setItem("roles", JSON.stringify(result.roles));
-        }
+      // Guardado estandarizado (siempre guardamos en localStorage para evitar lios, sessionStorage se puede implementar después si es necesario)
+      localStorage.setItem("userLoggedIn", "true");
+      
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+      }
+      if (result.user) {
+        localStorage.setItem("userId", result.user.id);
+        localStorage.setItem("userEmail", result.user.email);
+        localStorage.setItem("userName", result.user.name || result.user.nombre);
       }
 
-      showNotification("¡Inicio de sesión exitoso!", 'success');
+      window.showToast("¡Login exitoso!", "Redirigiendo a tu espacio de trabajo...", 'success');
       setTimeout(() => {
-        window.location.href = "profile";
+        window.location.href = "project-list";
       }, 1500);
       
     } else {
-      showNotification("Usuario o contraseña incorrectos.", 'error');
+      window.showToast("Error de acceso", result.message || "Usuario o contraseña incorrectos.", 'error');
 
       // Agrega intento fallido y si es igual o supera los intentos empieza el timer
       intentosFallidos++;
@@ -173,37 +127,13 @@ loginF.addEventListener("submit", async (event) => {
     }
   } catch (error) {
     console.error("Error completo:", error);
-    showNotification("Haz intentado demasiadas veces. Inténtalo de nuevo mas tarde.", 'error');
+    window.showToast("Error de servidor", "Ha ocurrido un problema de conexión. Inténtalo más tarde.", 'error');
+  } finally {
+    if (!loginBtn.disabled || loginBtn.textContent === "Accediendo...") {
+      loginBtn.disabled = false;
+      loginBtn.textContent = originalText;
+    }
   }
 });
 
-// Ver/Ocultar contraseña
-const togglePassword = document.querySelector("#togglePassword");
-const password = document.querySelector("#password");
-
-togglePassword.addEventListener("click", () => {
-  const esPassword = password.getAttribute("type") === "password";
-  password.setAttribute("type", esPassword ? "text" : "password");
-
-  togglePassword.classList.toggle("bi-eye");
-  togglePassword.classList.toggle("bi-eye-slash");
-});
-
-function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Auto-dismiss after 4 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'slideOutNotification 0.3s ease';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        }
-    }, 4000);
-}
+// La antigua función local showNotification fue reemplazada por window.showToast()

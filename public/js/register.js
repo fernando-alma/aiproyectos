@@ -4,35 +4,7 @@
 const form = document.querySelector("form");
 const submitBtn = form ? form.querySelector("[type=submit]") : null;
 
-function showNotification(message, type = "success") {
-  const existing = document.querySelector(".notification");
-  if (existing) existing.remove();
-
-  const n = document.createElement("div");
-  n.className = `notification ${type}`;
-  n.textContent = message;
-  document.body.appendChild(n);
-
-  setTimeout(() => {
-    if (n.parentNode) {
-      n.style.animation = "slideOutNotification 0.3s ease";
-      setTimeout(() => n.parentNode?.removeChild(n), 300);
-    }
-  }, 4000);
-}
-
-// Ver/ocultar contraseña
-document.querySelectorAll("[data-toggle-password]").forEach((btn) => {
-  const targetId = btn.dataset.togglePassword;
-  const input = document.getElementById(targetId);
-  if (!input) return;
-  btn.addEventListener("click", () => {
-    const isPass = input.type === "password";
-    input.type = isPass ? "text" : "password";
-    btn.classList.toggle("bi-eye", !isPass);
-    btn.classList.toggle("bi-eye-slash", isPass);
-  });
-});
+// La antigua función local showNotification fue reemplazada por la global window.showToast()
 
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -45,19 +17,22 @@ if (form) {
 
     // Validaciones cliente
     if (!name || !email || !password) {
-      showNotification("Completá todos los campos.", "error");
+      window.showToast("Faltan datos", "Completa todos los campos obligatorios.", "error");
       return;
     }
     if (password.length < 8) {
-      showNotification("La contraseña debe tener al menos 8 caracteres.", "error");
+      window.showToast("Contraseña débil", "La contraseña debe tener al menos 8 caracteres.", "error");
       return;
     }
     if (password !== confirm) {
-      showNotification("Las contraseñas no coinciden.", "error");
+      window.showToast("Las contraseñas no coinciden", "Verifica haberla escrito correctamente.", "error");
       return;
     }
 
-    if (submitBtn) submitBtn.disabled = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Procesando...';
+    }
 
     try {
       const response = await fetch(CONFIG.API_BASE + "auth/register", {
@@ -69,23 +44,26 @@ if (form) {
       const result = await response.json();
 
       if (result.success) {
-        // Guardar token y datos de sesión igual que en login.js
+        // Guardar token y datos de sesión
         localStorage.setItem("token",       result.token);
         localStorage.setItem("userLoggedIn","true");
         localStorage.setItem("userId",      result.user.id);
         localStorage.setItem("userEmail",   result.user.email);
         localStorage.setItem("userName",    result.user.name);
 
-        showNotification("¡Cuenta creada! Redirigiendo...", "success");
+        window.showToast("¡Cuenta creada!", "Redirigiendo a tus proyectos...", "success");
         setTimeout(() => { window.location.href = "project-list"; }, 1500);
       } else {
-        showNotification(result.message || "No se pudo crear la cuenta.", "error");
+        window.showToast("Error de registro", result.message || "No se pudo crear la cuenta.", "error");
       }
     } catch (err) {
       console.error("Error en registro:", err);
-      showNotification("Error de conexión con el servidor.", "error");
+      window.showToast("Error", "Ocurrió un error de conexión con el servidor.", "error");
     } finally {
-      if (submitBtn) submitBtn.disabled = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Crear Cuenta';
+      }
     }
   });
 }

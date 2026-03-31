@@ -17,19 +17,23 @@
         <!-- Form Section -->
         <section class="form-section">
             <div class="form-container">
-                <h1 class="form-title">Crear Cuenta</h1>
-                <form class="capitals-form" id="register-form">
+                <form class="capitals-form solid-dark" id="register-form">
+                    <h1 class="page-title" style="text-align: center; color: white; margin-bottom: 25px;">Crear Cuenta</h1>
                     <div class="form-group">
-                        <label for="email"></label>
-                        <input type="email" id="email" name="email" placeholder="Direccion de Email" required>
+                        <label for="name">Nombre completo</label>
+                        <input type="text" id="name" name="name" class="form-input" placeholder="Tu nombre" required>
                     </div>
                     <div class="form-group">
-                        <label for="password"></label>
-                        <input type="password" id="password" name="password" placeholder="Contraseña" min="1" maxlength="40" required>
+                        <label for="email">Dirección de email</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="ejemplo@aiweekend.com" required>
                     </div>
                     <div class="form-group">
-                        <label for="password2"></label>
-                        <input type="password" id="password2" name="password2" placeholder="Confirmar contraseña" min="1" maxlength="40" required>
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" min="1" maxlength="40" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_confirm">Confirmar contraseña</label>
+                        <input type="password" id="password_confirm" name="password_confirm" class="form-input" placeholder="••••••••" min="1" maxlength="40" required>
                     </div>
                     <button type="submit" class="submit-button">Crear Cuenta</button>
                 </form>

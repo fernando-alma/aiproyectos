@@ -60,6 +60,7 @@ body.create-project-page {
     margin-bottom: 10px;
     background: linear-gradient(90deg, #fff, #ccc);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

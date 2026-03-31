@@ -81,6 +81,13 @@
   }
 
   async function checkSession() {
+    // Si están en login/register pero ya están logueados, sacarlos de ahí
+    const path = window.location.pathname;
+    if ((path.includes("/login") || path.includes("/register")) && isUserLoggedIn()) {
+        window.location.replace("project-list");
+        return;
+    }
+
     if (isPublicPage()) return;
 
     if (!isUserLoggedIn()) {
