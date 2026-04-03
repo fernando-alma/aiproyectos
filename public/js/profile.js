@@ -81,7 +81,40 @@ document.addEventListener("DOMContentLoaded", async function() {
 
             } else {
                 // No llenó contraseñas, solo quiere guardar el "Nombre"
-                if(window.showToast) window.showToast("Función en Desarrollo", "La actualización de nombre y avatar estará disponible en la próxima versión de la API.", "info");
+                const newName = document.getElementById("profileName").value;
+                if (!newName) {
+                    if(window.showToast) window.showToast("Atención", "El nombre no puede estar vacío.", "warning");
+                    return;
+                }
+
+                const originalBtnText = saveBtn.textContent;
+                saveBtn.disabled = true;
+                saveBtn.textContent = "Guardando...";
+
+                try {
+                    const response = await window.authFetch(window.CONFIG.API_BASE + 'auth/update-profile', {
+                        method: 'POST',
+                        body: JSON.stringify({ name: newName })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        if(window.showToast) window.showToast("¡Perfil Actualizado!", "Tu nombre se ha cambiado correctamente.", "success");
+                        // Actualizar localStorage para que el navbar reaccione sin F5
+                        let ud = window.getUserData();
+                        ud.userName = newName;
+                        // Forzamos actualización de localStorage
+                        localStorage.setItem("userName", newName);
+                        sessionStorage.setItem("userName", newName);
+                    } else {
+                        if(window.showToast) window.showToast("Error", result.message || "Error al actualizar perfil.", "error");
+                    }
+                } catch (error) {
+                    if(window.showToast) window.showToast("Error", "Error de conexión con el servidor.", "error");
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalBtnText;
+                }
             }
         });
     }

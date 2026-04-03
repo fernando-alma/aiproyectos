@@ -91,7 +91,42 @@ class AuthApiTest extends TestCase
                 'new_password_confirm' => 'NewPassword456'
             ]
         ]);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function test_user_can_update_profile(): void
+    {
+        $token = $this->authenticateUser();
+        
+        $response = $this->http->post("{$this->baseUrl}/auth/update-profile", [
+            'headers' => ['Authorization' => "Bearer {$token}"],
+            'json' => [
+                'name' => 'Nombre Modificado'
+            ]
+        ]);
 
         $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string)$response->getBody(), true);
+        $this->assertTrue($body['success']);
+    }
+
+    public function test_user_can_request_password_reset(): void
+    {
+        // Registrar primero
+        $this->test_user_can_register();
+
+        $response = $this->http->post("{$this->baseUrl}/auth/forgot-password", [
+            'json' => [
+                'email' => 'test_auth@example.com'
+            ]
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = json_decode((string)$response->getBody(), true);
+        $this->assertTrue($body['success']);
+        
+        // El test de reset-password completo implicaría interceptar el token generado en DB. 
+        // Como es una prueba funcional de caja negra y no usamos DB mockeada separada aquí,
+        // validamos hasta el step de request que ya es una gran cobertura.
     }
 }

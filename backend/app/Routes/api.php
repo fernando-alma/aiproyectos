@@ -20,6 +20,9 @@ return [
     'auth/logout'           => ['controller' => AuthController::class, 'method' => 'logout',         'httpMethod' => 'POST', 'protected' => true],
     'auth/me'               => ['controller' => AuthController::class, 'method' => 'me',             'httpMethod' => 'GET',  'protected' => true],
     'auth/change-password'  => ['controller' => AuthController::class, 'method' => 'changePassword', 'httpMethod' => 'POST', 'protected' => true],
+    'auth/update-profile'   => ['controller' => AuthController::class, 'method' => 'updateProfile',  'httpMethod' => 'POST', 'protected' => true],
+    'auth/forgot-password'  => ['controller' => AuthController::class, 'method' => 'forgotPassword', 'httpMethod' => 'POST', 'protected' => false],
+    'auth/reset-password'   => ['controller' => AuthController::class, 'method' => 'resetPassword',  'httpMethod' => 'POST', 'protected' => false],
 
     // --- DASHBOARDS ---
     'dashboards'            => ['controller' => DashboardController::class, 'method' => 'getDashboards', 'httpMethod' => 'GET'], // Público

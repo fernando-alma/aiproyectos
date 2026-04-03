@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const forgotPasswordForm = document.getElementById("forgotPasswordForm");
   
     if (forgotPasswordForm) {
-    forgotPasswordForm.addEventListener("submit", function (event) {
+    forgotPasswordForm.addEventListener("submit", async function (event) {
       event.preventDefault();
 
       const email = document.getElementById("email").value;
@@ -17,18 +17,29 @@ document.addEventListener("DOMContentLoaded", function () {
       submitButton.disabled = true;
       submitButton.textContent = "Procesando...";
 
-      // Muteo intencional: Simulamos envío pero advertimos que aún no existe endpoint
-      setTimeout(() => {
-        if(window.showToast) {
-            window.showToast(
-                "Función en Desarrollo", 
-                "Tu API aún no soporta recuperación de contraseñas. Construiremos este endpoint pronto.", 
-                "info"
-            );
+      try {
+        const response = await fetch(window.CONFIG.API_BASE + 'auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        });
+        
+        const data = await response.json();
+
+        if (data.success) {
+            if(window.showToast) window.showToast("Correo Enviado", data.message || "Hemos enviado las instrucciones a tu correo.", "success");
+            // Limpiar email por seguridad
+            document.getElementById("email").value = "";
+        } else {
+            if(window.showToast) window.showToast("Error", data.message || "No se pudo procesar tu solicitud.", "error");
         }
+      } catch (err) {
+        console.error("Error al recuperar contraseña", err);
+        if(window.showToast) window.showToast("Error de red", "Verifica tu conexión y vuelve a intentarlo.", "error");
+      } finally {
         submitButton.disabled = false;
         submitButton.textContent = originalButtonText;
-      }, 1500);
+      }
     });
   }
 

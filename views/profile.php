@@ -62,7 +62,7 @@
 
                     <div class="form-group">
                         <label for="profileName">Nombre del perfil</label>
-                        <input type="text" id="profileName" class="form-input profile-input-override" value="Cargando..." readonly>
+                        <input type="text" id="profileName" class="form-input profile-input-override" value="Cargando...">
                     </div>
                 </div>
 

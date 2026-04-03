@@ -53,6 +53,7 @@ class TestCase extends BaseTestCase
             $db->exec("TRUNCATE TABLE project_members;");
             $db->exec("TRUNCATE TABLE join_requests;");
             $db->exec("TRUNCATE TABLE tasks;");
+            $db->exec("TRUNCATE TABLE password_resets;");
             
             // Reactiva comprobaciones de llaves foráneas
             $db->exec("SET FOREIGN_KEY_CHECKS = 1;");

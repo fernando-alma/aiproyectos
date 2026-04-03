@@ -167,4 +167,45 @@ class UserModel
         }
         return $result ?: 'US';
     }
+
+    // ------------------------------------------------------------------
+    // RECUPERACIÓN DE CONTRASEÑA
+    // ------------------------------------------------------------------
+
+    public function createPasswordResetToken(string $email): string|false
+    {
+        // Borramos cualquier token viejo de este email para que no se acumulen
+        $stmtDel = $this->db->prepare("DELETE FROM password_resets WHERE email = :email");
+        $stmtDel->execute([':email' => $email]);
+
+        // Generamos un token seguro
+        $token = bin2hex(random_bytes(32));
+
+        $stmt = $this->db->prepare("INSERT INTO password_resets (email, token) VALUES (:email, :token)");
+        if ($stmt->execute([':email' => $email, ':token' => $token])) {
+            return $token;
+        }
+        return false;
+    }
+
+    public function verifyPasswordResetToken(string $token): array|false
+    {
+        // Buscamos el token y verificamos que se haya creado hace menos de 1 hora
+        $stmt = $this->db->prepare("SELECT email FROM password_resets WHERE token = :token AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR) LIMIT 1");
+        $stmt->execute([':token' => $token]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
+    }
+
+    public function consumePasswordResetToken(string $token): void
+    {
+        $stmt = $this->db->prepare("DELETE FROM password_resets WHERE token = :token");
+        $stmt->execute([':token' => $token]);
+    }
+
+    public function updatePasswordByEmail(string $email, string $newPassword): bool
+    {
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("UPDATE users SET password_hash = :hash WHERE email = :email");
+        return $stmt->execute([':hash' => $newHash, ':email' => $email]);
+    }
 }

@@ -6,6 +6,7 @@ return [
     'login' => __DIR__ . '/views/login.php',
     'register' => __DIR__ . '/views/register.php',
     'recover-password' => __DIR__ . '/views/recover-password.php',
+    'reset-password' => __DIR__ . '/views/reset-password.php',
     'profile' => __DIR__ . '/views/profile.php',
     'project-list' => __DIR__ . '/views/project-list.php',
     'project-detail' => __DIR__ . '/views/project-detail.php',
