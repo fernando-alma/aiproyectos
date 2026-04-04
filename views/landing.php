@@ -200,216 +200,153 @@
 
     </div>
 
-    <section class="schedule-section">
+    <section class="schedule-section" id="cronograma">
         <div class="container">
-            <h2 class="section-title">Cronograma del Evento:</h2>
+            <h2 class="section-title">Cronograma de la Hackatón</h2>
 
-            <ul class="schedule-list">
-                <div class="date-pill">
-                    <span class="date-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                    </span>
-                    <span class="date-text">Viernes 12 de Diciembre, 2025</span>
+            <!-- Tabs de Navegación -->
+            <div class="schedule-tabs">
+                <button class="schedule-tab active" data-day="day1">Día 1: Viernes</button>
+                <button class="schedule-tab" data-day="day2">Día 2: Sábado</button>
+                <button class="schedule-tab" data-day="day3">Día 3: Domingo</button>
+            </div>
+
+            <!-- Contenido Día 1 -->
+            <div class="schedule-day-content active" id="day1">
+                <div class="day-info">
+                    <p class="day-summary">Presentación de ideas y conformación de equipos.</p>
+                    <p class="day-date">Viernes 10 de Abril</p>
                 </div>
-                <li class="schedule-item">
-                    <span class="schedule-time">09:30–09:40</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Bienvenida y Recibimiento</div>
-                        <div class="schedule-speaker">Recepción de asistentes</div>
-                    </div>
-                </li>
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">09:00 - 15:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Conferencias Principales (AIWKND)</div>
+                            <div class="schedule-speaker">Disertaciones de Microsoft, Magnolia y The Holocron en el Auditorio Principal.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">10:00 - 15:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Charlas Paralelas & AI Camp</div>
+                            <div class="schedule-speaker">Sesiones técnicas e institucionales en los Auditorios 2 y 3.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:00 - 16:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Intervalo de Networking</div>
+                            <div class="schedule-speaker">Apertura total de la Fun Zone, Expo Tech y stands de marcas.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">16:00 - 18:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Presentación de Ideas</div>
+                            <div class="schedule-speaker">Inicio oficial de la Hackatón y formación de equipos en el Auditorio Principal.</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
-                <li class="schedule-item">
-                    <span class="schedule-time">09:45–10:00</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Networking inicial</div>
-                        <div class="schedule-speaker">Guía a espacio de networking</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">10:00–10:30</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Apertura y Homenaje</div>
-                        <div class="schedule-speaker">Autoridades UTN (Homenaje Bocha Pessano)</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">10:35–10:55</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Presentación AI DAY</div>
-                        <div class="schedule-speaker">Equipo Aiweekend, Polo Tic, Alpha Docere</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">11:00–11:20</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Presentación Condor View</div>
-                        <div class="schedule-speaker">Jóvenes UTN</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">11:20–11:40</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Presentación Sentinel</div>
-                        <div class="schedule-speaker">Jóvenes UTN</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">12:10–12:30</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Presentación Aiweekend</div>
-                        <div class="schedule-speaker">Ale Bacic</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">12:35–12:55</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Presentación Aiweekend</div>
-                        <div class="schedule-speaker">Damián Keler</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">13:20–13:45</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Pit Región Sur Mendoza</div>
-                        <div class="schedule-speaker">Antonela Calabro</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">13:50–14:00</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Interacción con público</div>
-                        <div class="schedule-speaker">Alejandro Alegre</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">15:20–15:40</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Proyecto Los Reyunos</div>
-                        <div class="schedule-speaker">Melina</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">15:40–17:45</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Workshops Rotativos</div>
-                        <div class="schedule-speaker">Pitch, Sostenibilidad, Podcast, Proyecto UTN</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">18:00-18:30</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Cierre día 1 / Coffee Final</div>
-                        <div class="schedule-speaker">Fin de jornada</div>
-                    </div>
-                </li>
-            </ul>
-            <ul class="schedule-list">
-                <div class="date-pill">
-                    <span class="date-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                        </svg>
-                    </span>
-                    <span class="date-text">Sábado 13 de Diciembre, 2025</span>
+            <!-- Contenido Día 2 -->
+            <div class="schedule-day-content" id="day2">
+                <div class="day-info">
+                    <p class="day-summary">Inicio de la competencia intensiva y mentorías personalizadas.</p>
+                    <p class="day-date">Sábado 11 de Abril</p>
                 </div>
-                <li class="schedule-item">
-                    <span class="schedule-time">09:30–09:40</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Bienvenida</div>
-                        <div class="schedule-speaker">Recepción de asistentes</div>
-                    </div>
-                </li>
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">09:00 - 13:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Workshops Prácticos</div>
+                            <div class="schedule-speaker">3 talleres principales (Auditorio 1) y 6 talleres complementarios (Auditorio 2 y 3).</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:00 - 15:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Almuerzo y Desarrollo</div>
+                            <div class="schedule-speaker">Inicio del trabajo técnico de la Hackatón de IA.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">15:00 - 17:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Primera Ronda de Mentoreo</div>
+                            <div class="schedule-speaker">Sesión de guía con especialistas para potenciar los proyectos.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">19:00 - 20:30</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Segunda Ronda de Mentoreo</div>
+                            <div class="schedule-speaker">Revisión de avances técnicos antes del cierre de jornada.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">21:00 - 00:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Show Musical</div>
+                            <div class="schedule-speaker">Presentaciones en vivo de What the Funk y 5 Copas.</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
-                <li class="schedule-item">
-                    <span class="schedule-time">09:45–10:00</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Recibimiento</div>
-                        <div class="schedule-speaker">Guía a espacio de networking inicial</div>
-                    </div>
-                </li>
+            <!-- Contenido Día 3 -->
+            <div class="schedule-day-content" id="day3">
+                <div class="day-info">
+                    <p class="day-summary">Recta final, presentación de proyectos destacados, premiación y un cierre épico.</p>
+                    <p class="day-date">Domingo 12 de Abril</p>
+                </div>
+                <ul class="schedule-list">
+                    <li class="schedule-item">
+                        <span class="schedule-time">09:00 - 11:30</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Sprint Final</div>
+                            <div class="schedule-speaker">Trabajo intensivo de los equipos en sus prototipos.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">11:30 - 13:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Mentoreo Sorpresa</div>
+                            <div class="schedule-speaker">Últimos ajustes y consejos estratégicos antes del pitch.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">13:00 - 16:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Almuerzo de Camaradería</div>
+                            <div class="schedule-speaker">Preparación de presentaciones finales.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">16:00 - 18:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Pitch y Evaluación</div>
+                            <div class="schedule-speaker">Entrega final y presentación de proyectos ante el jurado de expertos.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">18:30 - 19:30</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Premiación</div>
+                            <div class="schedule-speaker">Anuncio de ganadores y deliberación del jurado en el Auditorio Principal.</div>
+                        </div>
+                    </li>
+                    <li class="schedule-item">
+                        <span class="schedule-time">20:00 - 22:00</span>
+                        <div class="schedule-details">
+                            <div class="schedule-event">Sunset de Cierre</div>
+                            <div class="schedule-speaker">After creativo y celebración final con DJs invitados.</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-                <li class="schedule-item">
-                    <span class="schedule-time">10:00–10:30</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Presentación Alpha Docere</div>
-                        <div class="schedule-speaker">Cosecha debate viernes</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">10:50–11:40</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Grupo 1</div>
-                        <div class="schedule-speaker">5 primeras presentaciones</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">11:50–12:40</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Grupo 2</div>
-                        <div class="schedule-speaker">5 siguientes presentaciones</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">12:55–13:45</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Grupo 3</div>
-                        <div class="schedule-speaker">5 siguientes presentaciones</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">13:45–14:10</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Palabras UTN / Bienvenidos al mundo laboral</div>
-                        <div class="schedule-speaker">Pit Región Sur Mendoza</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">14:20–15:05</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Grupo 4</div>
-                        <div class="schedule-speaker">5 siguientes presentaciones</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">15:10–16:00</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Espacio networking intencionado</div>
-                        <div class="schedule-speaker">PoloTic / Estudiantes UTN</div>
-                    </div>
-                </li>
-
-                <li class="schedule-item">
-                    <span class="schedule-time">16:00–18:00</span>
-                    <div class="schedule-details">
-                        <div class="schedule-event">Celebración</div>
-                        <div class="schedule-speaker">Posible ASADO post evento / Uso instalaciones UTN</div>
-                    </div>
-                </li>
-            </ul>
 
         </div>
         <div class="helpers-logos">
@@ -484,12 +421,33 @@
     <?php require_once("components/nav.php"); ?>
     <?php require_once("components/footer.php"); ?>
     <script>
+        // Funcionalidad de Pestañas del Cronograma
+        const scheduleTabs = document.querySelectorAll('.schedule-tab');
+        const scheduleContents = document.querySelectorAll('.schedule-day-content');
+
+        scheduleTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const day = tab.getAttribute('data-day');
+
+                // Quitar clase active de todas las pestañas y contenidos
+                scheduleTabs.forEach(t => t.classList.remove('active'));
+                scheduleContents.forEach(c => c.classList.remove('active'));
+
+                // Activar pestaña y contenido correspondiente
+                tab.classList.add('active');
+                document.getElementById(day).classList.add('active');
+            });
+        });
+
+        // Efectos de los colaboradores (existente)
         const cards = document.querySelectorAll('.collaborator-card');
         cards.forEach(card => {
             card.addEventListener('mouseenter', () => {
                 const video = card.querySelector("video");
-                video.autoplay = true;
-                video.style.display = 'block';
+                if (video) {
+                    video.autoplay = true;
+                    video.style.display = 'block';
+                }
             });
 
             card.addEventListener('mouseleave', () => {
