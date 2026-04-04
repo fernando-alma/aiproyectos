@@ -96,6 +96,7 @@ components:
         group_name:         { type: string,  example: "Grupo Alpha" }
         link_video:         { type: string,  format: uri, example: "https://youtu.be/xyz" }
         link_deploy:        { type: string,  format: uri, example: "https://miproyecto.vercel.app" }
+        link_repository:    { type: string,  format: uri, example: "https://github.com/usuario/proyecto", nullable: true }
         image:              { type: string,  example: "/uploads/projects/project_54.png" }
         created_by_user_id: { type: integer, example: 2 }
         created_at:         { type: string,  format: date-time }
@@ -717,6 +718,7 @@ paths:
                 group_name:  { type: string,  example: "Grupo Alpha" }
                 link_video:  { type: string,  format: uri, example: "https://youtu.be/xyz" }
                 link_deploy: { type: string,  format: uri, example: "https://miapp.vercel.app" }
+                link_repository: { type: string, format: uri, example: "https://github.com/usuario/proyecto", description: "URL del repositorio del proyecto" }
                 image:       { type: string,  format: binary, description: "Imagen del proyecto (JPG/PNG)" }
       responses:
         "201":
@@ -769,6 +771,7 @@ paths:
                 group_name:  { type: string }
                 link_video:  { type: string, format: uri }
                 link_deploy: { type: string, format: uri }
+                link_repository: { type: string, format: uri }
                 image:       { type: string, format: binary }
       responses:
         "200":

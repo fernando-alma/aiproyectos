@@ -64,6 +64,11 @@
                         <label for="link_deploy">URL del Deploy</label>
                         <input type="url" id="link_deploy" name="link_deploy" placeholder="https://mi-proyecto.vercel.app" required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="link_repository">URL del Repositorio</label>
+                        <input type="url" id="link_repository" name="link_repository" placeholder="https://github.com/usuario/mi-proyecto">
+                    </div>
                     
                     <div class="button-group">
                         <button type="button" class="btn btn-secondary" id="cancelButton">Cancelar</button>

@@ -34,6 +34,16 @@
                     <input type="text" id="pitch" name="pitch" placeholder="Ingresa el enlace de tu pitch">
                 </div>
                 <div class="form-group">
+                    <label for="link_deploy"></label>
+                    <p class="image-label-text">URL del Deploy</p>
+                    <input type="url" id="link_deploy" name="link_deploy" placeholder="https://mi-proyecto.vercel.app">
+                </div>
+                <div class="form-group">
+                    <label for="link_repository"></label>
+                    <p class="image-label-text">URL del Repositorio</p>
+                    <input type="url" id="link_repository" name="link_repository" placeholder="https://github.com/usuario/mi-proyecto">
+                </div>
+                <div class="form-group">
                     <label for="image"></label>
                     <p class="image-label-text">Seleccionar imagen de proyecto</p>
                     <input type="file" id="image" name="image" accept="image/*">

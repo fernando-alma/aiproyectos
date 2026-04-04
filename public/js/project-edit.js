@@ -121,6 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("description").value = data.project.description;
         document.getElementById("pitch").value = data.project.pitch;
 
+        const linkDeployField = document.getElementById("link_deploy");
+        if (linkDeployField) linkDeployField.value = data.project.link_deploy || '';
+
+        const linkRepoField = document.getElementById("link_repository");
+        if (linkRepoField) linkRepoField.value = data.project.link_repository || '';
+
         if (data.project.image) {
           imagePreview.innerHTML = `<img src="data:image/jpeg;base64,${data.project.image}" alt="Project Image" style="max-width: 200px; height: auto;" />`;
         } else {

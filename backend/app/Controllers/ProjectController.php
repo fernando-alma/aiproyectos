@@ -43,6 +43,7 @@ class ProjectController
         $groupName = $_POST['group_name'] ?? '';
         $linkVideo = $_POST['link_video'] ?? '';
         $linkDeploy = $_POST['link_deploy'] ?? '';
+        $linkRepository = $_POST['link_repository'] ?? '';
 
         if (empty($title) || empty($description) || empty($dashboardSlug)) {
             $this->sendJsonResponse(['success' => false, 'message' => 'Faltan datos requeridos'], 400);
@@ -55,7 +56,7 @@ class ProjectController
 
         $projectId = $this->projectModel->createProject(
             $pitch, $dashboardSlug, $title, $description, $status, 
-            $groupName, $linkVideo, $linkDeploy, $userId, null
+            $groupName, $linkVideo, $linkDeploy, $userId, null, $linkRepository ?: null
         );
 
         if (!$projectId) {
@@ -116,6 +117,7 @@ class ProjectController
         $groupName = $_POST['group_name'] ?? $project['group_name'];
         $linkVideo = $_POST['link_video'] ?? $project['link_video'];
         $linkDeploy = $_POST['link_deploy'] ?? $project['link_deploy'];
+        $linkRepository = $_POST['link_repository'] ?? ($project['link_repository'] ?? '');
 
         $imageUrl = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -133,7 +135,7 @@ class ProjectController
 
         $result = $this->projectModel->updateProject(
             (int)$projectId, $title, $description, $status, $pitch, 
-            $groupName, $linkVideo, $linkDeploy, $imageUrl
+            $groupName, $linkVideo, $linkDeploy, $imageUrl, $linkRepository ?: null
         );
         
         if ($result) {

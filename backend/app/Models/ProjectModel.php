@@ -35,15 +35,15 @@ class ProjectModel
         string $groupName,
         string $linkVideo,
         string $linkDeploy,
-        int $createdByUserId,      // <-- NUEVO: ID del dueño del proyecto
-        ?string $imageData = null
+        int $createdByUserId,
+        ?string $imageData = null,
+        ?string $linkRepository = null
     ): ?int {
         $dashboard = $this->dashboardModel->findBySlug($dashboardSlug);
         if (!$dashboard) {
             return null;
         }
 
-        // Se eliminó members_data y se agregó created_by_user_id
         $sql = "INSERT INTO projects (
                     dashboard_id, 
                     title, 
@@ -54,8 +54,9 @@ class ProjectModel
                     group_name,
                     link_video,
                     link_deploy,
+                    link_repository,
                     created_by_user_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $this->conn->prepare($sql);
         
@@ -69,7 +70,8 @@ class ProjectModel
             $groupName,            // 7. group_name
             $linkVideo,            // 8. link_video
             $linkDeploy,           // 9. link_deploy
-            $createdByUserId       // 10. created_by_user_id
+            $linkRepository,       // 10. link_repository
+            $createdByUserId       // 11. created_by_user_id
         ];
         
         if ($stmt->execute($params)) {
@@ -120,20 +122,21 @@ class ProjectModel
         string $groupName,
         string $linkVideo,
         string $linkDeploy,
-        ?string $imageData = null
+        ?string $imageData = null,
+        ?string $linkRepository = null
     ): bool {
         if ($imageData !== null) {
             $sql = "UPDATE projects 
-                    SET title = ?, description = ?, pitch = ?, status = ?, group_name = ?, link_video = ?, link_deploy = ?, image = ? 
+                    SET title = ?, description = ?, pitch = ?, status = ?, group_name = ?, link_video = ?, link_deploy = ?, link_repository = ?, image = ? 
                     WHERE id = ?";
             $stmt = $this->conn->prepare($sql);
-            return $stmt->execute([$title, $description, $pitch, $status, $groupName, $linkVideo, $linkDeploy, $imageData, $projectId]);
+            return $stmt->execute([$title, $description, $pitch, $status, $groupName, $linkVideo, $linkDeploy, $linkRepository, $imageData, $projectId]);
         } else {
             $sql = "UPDATE projects 
-                    SET title = ?, description = ?, pitch = ?, status = ?, group_name = ?, link_video = ?, link_deploy = ? 
+                    SET title = ?, description = ?, pitch = ?, status = ?, group_name = ?, link_video = ?, link_deploy = ?, link_repository = ? 
                     WHERE id = ?";
             $stmt = $this->conn->prepare($sql);
-            return $stmt->execute([$title, $description, $pitch, $status, $groupName, $linkVideo, $linkDeploy, $projectId]);
+            return $stmt->execute([$title, $description, $pitch, $status, $groupName, $linkVideo, $linkDeploy, $linkRepository, $projectId]);
         }
     }
 

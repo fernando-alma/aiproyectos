@@ -1,507 +1,976 @@
+/**
+ * project-detail.js — FASE 3: El Corazón del Sistema
+ * 
+ * Renderizado condicional inteligente, interacción basada en roles JWT,
+ * y sidebar de control para el dueño/admin.
+ */
+
 const API_BASE = CONFIG.API_BASE;
 
-// SOLUCIÓN FRONTEND: Función global para verificar si un usuario es creador de un proyecto
-window.isProjectCreator = function (projectId, userEmail) {
-  const creators = JSON.parse(localStorage.getItem("projectCreators") || "[]");
-  return creators.some((c) => c.projectId == projectId && c.email === userEmail);
-};
-
-// SOLUCIÓN FRONTEND: Función global para obtener el rol funcional de un usuario
-window.getUserFunctionalRole = function (projectId, userEmail, backendRole) {
-  if (window.isProjectCreator(projectId, userEmail)) return "owner";
-  return backendRole || "member";
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  const projectDetailContent = document.getElementById("projectDetailContent");
+document.addEventListener('DOMContentLoaded', () => {
+  const mainContent = document.getElementById('projectDetailContent');
+  const pdLoading = document.getElementById('pdLoading');
   const urlParams = new URLSearchParams(window.location.search);
-  const projectId = urlParams.get("id");
+  const projectId = urlParams.get('id');
+
+  // State
   let project = null;
+  let currentUser = null;  // { id, email, name, role }
+  let members = [];
+  let isCreator = false;
+  let isMember = false;
+  let isAdmin = false;
 
-  if (projectId) fetchProjectDetails(projectId);
-  else projectDetailContent.innerHTML = "<p>No se especificó ningún ID de proyecto.</p>";
+  // ─── Bootstrap ──────────────────────────────────────────────────────
+  if (!projectId) {
+    mainContent.innerHTML = `<p style="color: rgba(255,255,255,0.5); text-align:center; padding: 3rem;">No se especificó ningún ID de proyecto.</p>`;
+    return;
+  }
 
-  async function fetchProjectDetails(id) {
+  init();
+
+  async function init() {
     try {
-      const response = await fetch(`${API_BASE}project/get?id=${id}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
+      // Fetch project + user data in parallel
+      const [projectData, userData] = await Promise.all([
+        fetchProject(projectId),
+        fetchCurrentUser()
+      ]);
 
-      if (data.success && data.project) {
-        project = data.project;
-        renderProjectDetails(project);
-      } else {
-        projectDetailContent.innerHTML = `<p>Error al cargar detalles: ${data.message || "sin detalles"}.</p>`;
+      project = projectData;
+      currentUser = userData;
+
+      if (!project) {
+        mainContent.innerHTML = `<p style="color: rgba(255,255,255,0.5); text-align:center; padding: 3rem;">Proyecto no encontrado.</p>`;
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching project detail:", error);
-      projectDetailContent.innerHTML =
-        "<p>No se pudieron cargar los detalles del proyecto. Inténtalo de nuevo más tarde.</p>";
+
+      // Update page title
+      document.title = `AIWKND — ${project.title}`;
+
+      // Determine user roles
+      if (currentUser) {
+        isCreator = String(currentUser.id) === String(project.created_by_user_id);
+        isAdmin = currentUser.role === 'admin';
+      }
+
+      // Fetch members
+      members = await fetchMembers(projectId);
+
+      // Check if current user is a member
+      if (currentUser) {
+        isMember = members.some(m => String(m.user_id) === String(currentUser.id));
+      }
+
+      // Render everything
+      renderMainContent();
+      setupSidebar();
+      setupDeleteModal();
+
+    } catch (err) {
+      console.error('Error initializing project detail:', err);
+      mainContent.innerHTML = `<p style="color: rgba(255,255,255,0.5); text-align:center; padding: 3rem;">Error al cargar la información del proyecto.</p>`;
     }
   }
 
-  function truncateTitleForMobile(title, maxLength = 154) {
-    const isMobile = window.innerWidth < 768;
-    if (isMobile && title && title.length > maxLength) return title.substring(0, maxLength) + "...";
-    return title;
+  // ─── API Helpers ────────────────────────────────────────────────────
+
+  async function fetchProject(id) {
+    const res = await fetch(`${API_BASE}project/get?id=${id}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success && data.project ? data.project : null;
   }
 
-  function escapeHtml(str) {
+  async function fetchCurrentUser() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return null;
+
+    try {
+      const res = await fetch(`${API_BASE}auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.success && data.user ? data.user : null;
+    } catch {
+      // Fallback to localStorage
+      const userId = localStorage.getItem('userId');
+      const email = localStorage.getItem('userEmail');
+      const name = localStorage.getItem('userName');
+      if (userId && email) {
+        return { id: userId, email, name, role: 'user' };
+      }
+      return null;
+    }
+  }
+
+  async function fetchMembers(projectId) {
+    try {
+      const res = await fetch(`${API_BASE}project/members?id=${projectId}`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.success && Array.isArray(data.members) ? data.members : [];
+    } catch {
+      return [];
+    }
+  }
+
+  async function fetchJoinRequests(projectId) {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (!token) return [];
+
+    try {
+      const res = await fetch(`${API_BASE}project/getJoinRequests?project_id=${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.success && Array.isArray(data.requests) ? data.requests : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function getAuthHeaders() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    return {
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json'
+    };
+  }
+
+  // ─── Utilities ──────────────────────────────────────────────────────
+
+  function esc(str) {
+    if (!str) return '';
     return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
-  function renderProjectDetails(project) {
-    if (!project) return;
+  function hasValue(val) {
+    return val !== null && val !== undefined && String(val).trim() !== '';
+  }
 
-    const pitchEmbed = (() => {
-      const pitch = (project.pitch || "").trim();
-      const videoUrl = (project.link_video || "").trim();
-      let embedUrl = "";
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      return new Date(dateStr).toLocaleDateString('es-ES', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+    } catch {
+      return dateStr;
+    }
+  }
 
-      if (pitch) {
-        const ytMatch = pitch.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
-        if (ytMatch?.[1]) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
-      } else if (videoUrl) {
-        const ytMatch = videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
-        if (ytMatch?.[1]) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}`;
-      }
-
-      if (embedUrl) {
-        return `
-          <div class="project-section">
-            <div class="section-title">Pitch</div>
-            <div class="section-content" style="margin-top:10px; display:flex; justify-content:center;">
-              <iframe width="560" height="315"
-                src="${embedUrl}"
-                title="Pitch" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen></iframe>
-            </div>
-          </div>`;
-      }
-
-      const safeText = escapeHtml(pitch || videoUrl);
-      const isUrl = /^(https?:)\/\//i.test(safeText);
-      const linkHtml = isUrl
-        ? `<a href="${safeText}" target="_blank" rel="noopener noreferrer" style="color:#fafafa; font-weight:600;">${safeText}</a>`
-        : safeText;
-
-      return pitch || videoUrl ? `
-        <div class="project-section">
-          <div class="section-title">Pitch</div>
-          <div class="section-content" style="margin-top:10px; text-align:left;">${linkHtml}</div>
-        </div>` : "";
-    })();
-
-    const formatProjectDescription = (description) => {
-      if (!description) return "";
-      const lines = description.split("\n").filter((line) => line.trim());
-
-      let html = "";
-      let currentSection = "";
-      let bulletPoints = [];
-      let isFirstLine = true;
-      let hasProcessedInitialBullets = false;
-
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-
-        if (isFirstLine) {
-          html += `<div class="project-title-numbered">${escapeHtml(line)}</div>`;
-          isFirstLine = false;
-          continue;
-        }
-
-        if (/^[•\-]\s/.test(line) && !hasProcessedInitialBullets) {
-          bulletPoints.push(escapeHtml(line.replace(/^[•\-]\s/, "")));
-          continue;
-        }
-
-        if (bulletPoints.length > 0 && !hasProcessedInitialBullets) {
-          html += `<ul class="project-bullet-points">${bulletPoints.map((p) => `<li>${p}</li>`).join("")}</ul>`;
-          bulletPoints = [];
-          hasProcessedInitialBullets = true;
-        }
-
-        if (line.endsWith(":")) {
-          currentSection = escapeHtml(line);
-          html += `<div class="project-section-title">${currentSection}</div>`;
-          continue;
-        }
-
-        if (/^[•\-]\s/.test(line)) {
-          if (bulletPoints.length === 0) html += `<ul class="project-bullet-points">`;
-          bulletPoints.push(escapeHtml(line.replace(/^[•\-]\s/, "")));
-          continue;
-        }
-
-        if (bulletPoints.length > 0) {
-          html += bulletPoints.map((p) => `<li>${p}</li>`).join("") + `</ul>`;
-          bulletPoints = [];
-        }
-
-        if (currentSection && line) html += `<div class="project-section-content">${escapeHtml(line)}</div>`;
-        else if (line) html += `<div class="project-general-text">${escapeHtml(line)}</div>`;
-      }
-
-      if (bulletPoints.length > 0) {
-        html += bulletPoints.map((p) => `<li>${p}</li>`).join("") + `</ul>`;
-      }
-
-      return html;
+  function formatStatus(status) {
+    const map = {
+      'in_progress': 'En progreso',
+      'completed': 'Completado',
+      'active': 'Activo',
+      'paused': 'Pausado'
     };
+    return map[status] || status || 'Sin estado';
+  }
 
-    const parseMembersData = (membersData) => {
-      if (!membersData) return [];
-      return membersData.split('\n').map(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return null;
-        const parts = trimmed.split(', ');
-        const name = parts[0]?.trim();
-        const linkedin = parts[1]?.trim();
-        return name && linkedin ? { name: escapeHtml(name), linkedin: escapeHtml(linkedin) } : null;
-      }).filter(Boolean);
-    };
+  function getInitials(name) {
+    if (!name) return '??';
+    const parts = name.trim().split(/\s+/);
+    return (parts[0]?.[0] || '').toUpperCase() + (parts[1]?.[0] || '').toUpperCase() || parts[0]?.[0]?.toUpperCase() || '?';
+  }
 
-    const members = parseMembersData(project.members_data);
-    
-    projectDetailContent.innerHTML = `
-      <div class="project-section">
-          <div class="section-content">
-            ${project.image ? `<img src="backend/public${escapeHtml(project.image)}" alt="Project Image" style="max-width:100%; height:auto; border-radius: 12px;">` : '<img src="public/images/fondos/fondo.jpg" alt="Project Image" style="max-width:100%; height:auto; border-radius: 12px;">'}
-          </div>
-        </div>
+  function extractYouTubeId(url) {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+    return match?.[1] || null;
+  }
 
-      <h2 class="form-title project-detail-title">${escapeHtml(project.title)}</h2>
+  // ─── Main Render ────────────────────────────────────────────────────
 
-      <div class="project-details">
-        <div class="project-description-formatted">
-          ${formatProjectDescription(project.description)}
-        </div>
-        ${pitchEmbed}
+  function renderMainContent() {
+    let html = '';
 
-        <div class="project-section">
-          <div class="section-title">Estado</div>
-          <div class="section-content">${escapeHtml(project.status || 'N/A')}</div>
-        </div>
+    // 1. Hero Image
+    if (hasValue(project.image)) {
+      html += `<img class="pd-hero-image" src="backend/public${esc(project.image)}" alt="${esc(project.title)}" loading="lazy">`;
+    }
 
-        <div class="project-section">
-          <div class="section-title">Grupo</div>
-          <div class="section-content">${escapeHtml(project.group_name || 'N/A')}</div>
-        </div>
-
-        <div class="project-section">
-          <div class="section-title">Enlace de Despliegue</div>
-          <div class="section-content">
-            ${project.link_deploy ? `<a href="${escapeHtml(project.link_deploy)}" target="_blank" rel="noopener noreferrer">${escapeHtml(project.link_deploy)}</a>` : 'No disponible'}
-          </div>
-        </div>
-
-        <div class="project-section">
-          <div class="section-title">Creado</div>
-          <div class="section-content">${project.created_at ? new Date(project.created_at).toLocaleString('es-ES') : 'N/A'}</div>
-        </div>
-
-        <div class="project-section">
-          <div class="section-title">Actualizado</div>
-          <div class="section-content">${project.updated_at ? new Date(project.updated_at).toLocaleString('es-ES') : 'N/A'}</div>
-        </div>
+    // 2. Header (always rendered — title is required)
+    html += `
+      <div class="pd-header">
+        <span class="pd-header-label">Proyecto:</span>
+        <h1 class="pd-title">${esc(project.title)}</h1>
       </div>
     `;
 
-    const joinButton = document.getElementById("joinButton");
-    const leaveButton = document.getElementById("leaveButton");
-    const editButton = document.getElementById("editButton");
-    const deleteButton = document.getElementById("deleteButton");
+    // 3. Badges (status + date + group)
+    html += renderBadges();
 
-    async function fetchWithTimeout(url, options, timeout = 10000) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
-      try {
-        return await fetch(url, { ...options, signal: controller.signal });
-      } finally {
-        clearTimeout(timeoutId);
+    // 4. Action buttons (Deploy / Repository)
+    html += renderActionButtons();
+
+    // 5. Description
+    if (hasValue(project.description)) {
+      html += `
+        <div class="pd-section">
+          <span class="pd-section-label">Descripción:</span>
+          <div class="pd-description">
+            ${formatProjectDescription(project.description)}
+          </div>
+        </div>
+      `;
+    }
+
+    // 6. Pitch / Video
+    html += renderVideoSection();
+
+    // 7. Team
+    html += renderTeamSection();
+
+    // 8. Interaction Button
+    html += renderInteractionButton();
+
+    // Replace loading with real content
+    mainContent.innerHTML = html;
+
+    // Bind interaction events
+    bindInteractionEvents();
+  }
+
+  // ─── Badges ─────────────────────────────────────────────────────────
+
+  function renderBadges() {
+    let badges = '';
+
+    if (hasValue(project.status)) {
+      const isCompleted = project.status === 'completed';
+      const statusClass = isCompleted ? 'pd-badge--completed' : 'pd-badge--active';
+      badges += `
+        <span class="pd-badge ${statusClass}">
+          <span class="pd-badge-dot"></span>
+          ${esc(formatStatus(project.status))}
+        </span>
+      `;
+    }
+
+    if (hasValue(project.created_at)) {
+      badges += `
+        <span class="pd-badge pd-badge--date">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          ${esc(formatDate(project.created_at))}
+        </span>
+      `;
+    }
+
+    if (hasValue(project.group_name)) {
+      badges += `
+        <span class="pd-badge pd-badge--group">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          ${esc(project.group_name)}
+        </span>
+      `;
+    }
+
+    if (!badges) return '';
+    return `<div class="pd-badges">${badges}</div>`;
+  }
+
+  // ─── Action Buttons ────────────────────────────────────────────────
+
+  function renderActionButtons() {
+    let buttons = '';
+
+    if (hasValue(project.link_deploy)) {
+      buttons += `
+        <a href="${esc(project.link_deploy)}" target="_blank" rel="noopener noreferrer" class="pd-btn-demo" id="btnDemoLive">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          Ver Demo en Vivo
+        </a>
+      `;
+    }
+
+    if (hasValue(project.link_repository)) {
+      buttons += `
+        <a href="${esc(project.link_repository)}" target="_blank" rel="noopener noreferrer" class="pd-btn-repo" id="btnRepo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+          Ver Repositorio
+        </a>
+      `;
+    }
+
+    if (!buttons) return '';
+    return `<div class="pd-actions">${buttons}</div>`;
+  }
+
+  // ─── Description Formatter ─────────────────────────────────────────
+
+  function formatProjectDescription(description) {
+    if (!description) return '';
+    const lines = description.split('\n').filter(l => l.trim());
+    let html = '';
+    let bulletPoints = [];
+    let inList = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      // Bullet point
+      if (/^[•\-]\s/.test(line)) {
+        if (!inList) {
+          html += '<ul class="pd-desc-list">';
+          inList = true;
+        }
+        bulletPoints.push(esc(line.replace(/^[•\-]\s/, '')));
+        continue;
       }
+
+      // Close open list
+      if (inList) {
+        html += bulletPoints.map(b => `<li>${b}</li>`).join('') + '</ul>';
+        bulletPoints = [];
+        inList = false;
+      }
+
+      // Section heading (line ending with ":")
+      if (line.endsWith(':')) {
+        html += `<div class="pd-desc-section-title">${esc(line)}</div>`;
+        continue;
+      }
+
+      // Normal text
+      html += `<div class="pd-desc-text">${esc(line)}</div>`;
     }
 
-    function updateButtonStates(activeButton, inactiveButton, activeText, isDisabled) {
-      activeButton.disabled = isDisabled;
-      activeButton.textContent = activeText;
-      activeButton.style.display = "inline-block";
-      inactiveButton.style.display = "none";
+    // Close trailing list
+    if (inList) {
+      html += bulletPoints.map(b => `<li>${b}</li>`).join('') + '</ul>';
     }
 
-    function getUserCredentials() {
-      return {
-        userName: localStorage.getItem("userName") || "",
-        userEmail: localStorage.getItem("userEmail") || "",
-        userId: localStorage.getItem("userId") || "",
-      };
+    return html;
+  }
+
+  // ─── Video Section ─────────────────────────────────────────────────
+
+  function renderVideoSection() {
+    // Check both pitch and link_video for YouTube URLs
+    const videoUrl = (project.link_video || '').trim();
+    const pitch = (project.pitch || '').trim();
+
+    let youtubeId = extractYouTubeId(pitch) || extractYouTubeId(videoUrl);
+
+    if (!youtubeId) {
+      // If pitch exists but is not a YouTube URL, render as text
+      if (pitch) {
+        const isUrl = /^https?:\/\//i.test(pitch);
+        const content = isUrl
+          ? `<a href="${esc(pitch)}" target="_blank" rel="noopener noreferrer" style="color: var(--aiw-cyan); word-break: break-all;">${esc(pitch)}</a>`
+          : esc(pitch);
+
+        return `
+          <div class="pd-section">
+            <span class="pd-section-label">Pitch:</span>
+            <div class="pd-description">${content}</div>
+          </div>
+        `;
+      }
+      return '';
     }
 
-    function setupProjectButton(button, action, otherButton, apiEndpoint) {
-      if (!button) return;
+    return `
+      <div class="pd-video-section">
+        <span class="pd-section-label">Pitch / Video:</span>
+        <div class="pd-video-container">
+          <iframe
+            src="https://www.youtube.com/embed/${youtubeId}"
+            title="Video del proyecto"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+        </div>
+      </div>
+    `;
+  }
 
-      button.addEventListener("click", async () => {
-        if (!window.isAuthenticated || !window.isAuthenticated()) {
-          if (typeof window.showLoginModal === "function") window.showLoginModal();
-          else document.getElementById("joinStatus").textContent = "No se puede mostrar el modal de inicio de sesión.";
-          return;
-        }
+  // ─── Team Section ──────────────────────────────────────────────────
 
-        const { userName, userEmail } = getUserCredentials();
-        const joinStatus = document.getElementById("joinStatus");
+  function renderTeamSection() {
+    // Build the display list, ensuring the creator is always present
+    let displayMembers = [...members];
 
-        if (!userEmail || !userName) {
-          joinStatus.textContent = "Por favor, inicia sesión para unirte a un proyecto.";
-          return;
-        }
+    // Check if the creator is already in the members list
+    const creatorInList = displayMembers.some(
+      m => String(m.user_id) === String(project.created_by_user_id)
+    );
 
-        updateButtonStates(button, otherButton, action === "join" ? "Uniéndose..." : "Abandonando...", true);
-        joinStatus.textContent = "";
+    // If creator is not in the list, add a fallback entry
+    if (!creatorInList && project.created_by_user_id) {
+      // Try to figure out the creator's name from currentUser (if they are the creator)
+      let creatorName = 'Creador del proyecto';
+      if (currentUser && String(currentUser.id) === String(project.created_by_user_id)) {
+        creatorName = currentUser.name || creatorName;
+      }
 
-        const formData = new FormData();
-        if (action === "join") {
-          formData.append("project_id", project.id);
-          formData.append("name", userName);
-          formData.append("email", userEmail);
-          formData.append("role", "member");
-        } else {
-          formData.append("project_id", project.id);
-          formData.append("email", userEmail);
-        }
-
-        try {
-          const res = await fetchWithTimeout(`${API_BASE}${apiEndpoint}`, { method: "POST", body: formData });
-          const data = await res.json();
-
-          if (!res.ok) throw new Error(data.message || `Error HTTP: ${res.status}`);
-          if (!data.success) throw new Error(data.message || "Error desconocido.");
-
-          joinStatus.textContent = action === "join"
-            ? "Solicitud enviada / unido correctamente."
-            : "Has abandonado el proyecto.";
-
-          updateButtonStates(otherButton, button, action === "join" ? "Abandonar" : "Unirse", false);
-          loadProjectMembers(project.id);
-        } catch (err) {
-          console.error(err);
-          joinStatus.textContent =
-            err.name === "AbortError" ? "Tiempo de espera agotado. Verifica tu conexión." : (err.message || "Error al procesar.");
-        } finally {
-          if (button.style.display !== "none") {
-            updateButtonStates(button, otherButton, action === "join" ? "Unirse" : "Abandonar", false);
-          }
-        }
+      displayMembers.unshift({
+        user_id: project.created_by_user_id,
+        user_name: creatorName,
+        role: 'owner',
+        _isCreatorFallback: true
       });
     }
 
-    async function checkMembershipAndSetState() {
-      const userEmail = localStorage.getItem("userEmail");
-      if (!userEmail || !joinButton) return;
+    if (displayMembers.length === 0) return '';
 
-      try {
-        const resp = await fetch(`${API_BASE}project/members?id=${project.id}`);
-        if (!resp.ok) return;
-        const data = await resp.json();
-
-        if (data.success && Array.isArray(data.members)) {
-          const already = data.members.some((m) => m.email === userEmail);
-          joinButton.style.display = already ? "none" : "inline-block";
-          leaveButton.style.display = already ? "inline-block" : "none";
-
-          const me = data.members.find((m) => m.email === userEmail);
-          const backendRole = (me?.role ? String(me.role).toLowerCase() : "");
-          const functionalRole = window.getUserFunctionalRole(project.id, userEmail, backendRole);
-          const isOwner = functionalRole === "owner";
-
-          editButton.style.display = isOwner ? "inline-block" : "none";
-          deleteButton.style.display = isOwner ? "inline-block" : "none";
-        }
-      } catch (_) {}
-    }
-
-    checkMembershipAndSetState();
-    loadProjectMembers(project.id);
-
-    // Endpoints según tu backend actual
-    setupProjectButton(joinButton, "join", leaveButton, "project/createProjectMember");
-    setupProjectButton(leaveButton, "leave", joinButton, "member/delete");
-
-    // Delete modal
-    const deleteModal = document.getElementById("deleteModal");
-    const deleteCancelBtn = document.getElementById("deleteCancelBtn");
-    const deleteConfirmBtn = document.getElementById("deleteConfirmBtn");
-
-    if (deleteButton) {
-      deleteButton.addEventListener("click", () => {
-        if (deleteModal) deleteModal.style.display = "flex";
-      });
-    }
-
-    if (deleteCancelBtn) {
-      deleteCancelBtn.addEventListener("click", () => {
-        if (deleteModal) deleteModal.style.display = "none";
-      });
-    }
-
-    if (deleteConfirmBtn) {
-      deleteConfirmBtn.addEventListener("click", async () => {
-        try {
-          const fd = new FormData();
-          fd.append("project_id", project.id);
-          fd.append("id", project.id); // compatibilidad
-          const res = await fetch(`${API_BASE}project/delete`, { method: "POST", body: fd });
-          const data = await res.json();
-          if (res.ok && data?.success) {
-            showNotification("Proyecto eliminado exitosamente.", "success");
-            setTimeout(() => (window.location.href = "project-list"), 1200);
-          } else {
-            showNotification(data.message || "No se pudo eliminar el proyecto.", "error");
-          }
-        } catch (err) {
-          console.error(err);
-          showNotification("Error de conexión al eliminar el proyecto.", "error");
-        } finally {
-          if (deleteModal) deleteModal.style.display = "none";
-        }
-      });
-    }
-
-    if (deleteModal) {
-      deleteModal.addEventListener("click", (e) => {
-        if (e.target === deleteModal) deleteModal.style.display = "none";
-      });
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && deleteModal?.style.display === "flex") deleteModal.style.display = "none";
+    // Sort: Creator first, then rest
+    const sortedMembers = displayMembers.sort((a, b) => {
+      const aIsCreator = String(a.user_id) === String(project.created_by_user_id);
+      const bIsCreator = String(b.user_id) === String(project.created_by_user_id);
+      if (aIsCreator && !bIsCreator) return -1;
+      if (!aIsCreator && bIsCreator) return 1;
+      return 0;
     });
+
+    const cards = sortedMembers.map(m => {
+      const memberIsCreator = String(m.user_id) === String(project.created_by_user_id);
+      const initials = getInitials(m.user_name || m.name || 'U');
+      const name = esc(m.user_name || m.name || 'Usuario');
+      const creatorClass = memberIsCreator ? 'pd-team-card--creator' : '';
+      const roleClass = memberIsCreator ? 'pd-team-role--creator' : '';
+      const roleText = memberIsCreator ? 'Creador' : (m.role || 'Miembro');
+
+      return `
+        <div class="pd-team-card ${creatorClass}">
+          <div class="pd-team-avatar">${initials}</div>
+          <span class="pd-team-name">${name}</span>
+          <span class="pd-team-role ${roleClass}">${esc(roleText)}</span>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="pd-team-section">
+        <span class="pd-team-title">Equipo</span>
+        <div class="pd-team-grid">${cards}</div>
+      </div>
+    `;
   }
 
-  async function loadProjectMembers(projectId) {
-    const membersList = document.getElementById("membersList");
-    if (!membersList) return;
+  // ─── Interaction Button ────────────────────────────────────────────
 
-    try {
-      const response = await fetch(`${API_BASE}project/members?id=${projectId}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          membersList.innerHTML =
-            '<p style="color:#a1a1a1; font-style: italic; text-align: center;">La funcionalidad de miembros no está disponible.</p>';
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+  function renderInteractionButton() {
+    // Creator: No button
+    if (isCreator) return '';
 
-      const data = await response.json();
-      if (data.success && Array.isArray(data.members)) displayProjectMembers(data.members);
-      else membersList.innerHTML = '<p style="color:#a1a1a1; text-align:center;">No hay miembros en este proyecto.</p>';
-    } catch (error) {
-      console.error("Error cargando miembros:", error);
-      membersList.innerHTML = '<p style="color:#a1a1a1; text-align:center;">No se pudieron cargar los miembros.</p>';
+    // Visitor (no token)
+    if (!currentUser) {
+      return `
+        <div class="pd-interaction">
+          <button class="pd-btn-join" id="btnJoinProject">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            Unirse al Proyecto
+          </button>
+        </div>
+      `;
+    }
+
+    // Logged in, is member → Leave button
+    if (isMember) {
+      return `
+        <div class="pd-interaction">
+          <button class="pd-btn-leave" id="btnLeaveProject">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            Abandonar este proyecto
+          </button>
+        </div>
+      `;
+    }
+
+    // Logged in, not member → Join button
+    return `
+      <div class="pd-interaction">
+        <button class="pd-btn-join" id="btnJoinProject">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+          Unirse al Proyecto
+        </button>
+      </div>
+    `;
+  }
+
+  // ─── Interaction Event Handlers ────────────────────────────────────
+
+  function bindInteractionEvents() {
+    const btnJoin = document.getElementById('btnJoinProject');
+    const btnLeave = document.getElementById('btnLeaveProject');
+
+    if (btnJoin) {
+      btnJoin.addEventListener('click', handleJoinClick);
+    }
+
+    if (btnLeave) {
+      btnLeave.addEventListener('click', handleLeaveClick);
     }
   }
 
-  function displayProjectMembers(members) {
-    const membersList = document.getElementById("membersList");
-    if (!membersList) return;
-
-    if (members.length === 0) {
-      membersList.innerHTML = '<p style="text-align: center; color:#a1a1a1;">No hay miembros en este proyecto.</p>';
+  async function handleJoinClick() {
+    // Visitor → redirect to login
+    if (!currentUser) {
+      if (window.showToast) {
+        window.showToast('Inicia sesión', 'Necesitas una cuenta para unirte a este proyecto.', 'info');
+      }
+      setTimeout(() => {
+        window.location.href = `login?redirect=project-detail?id=${projectId}`;
+      }, 1200);
       return;
     }
 
-    const membersHTML = members
-      .map((member) => {
-        const joinDate = member.joined_at
-          ? new Date(member.joined_at).toLocaleDateString("es-ES", { dateStyle: "medium" })
-          : "Fecha no disponible";
+    // Logged in → send join request
+    const btn = document.getElementById('btnJoinProject');
+    if (!btn) return;
 
-        const memberName = escapeHtml(member.name || member.user_name || "Usuario");
-        const memberEmail = escapeHtml(member.email || "");
-
-        const backendRole = member.role || "Miembro";
-        const functionalRole = window.getUserFunctionalRole(project.id, member.email, backendRole);
-        const memberRole = functionalRole === "owner" ? "Owner" : escapeHtml(backendRole);
-
-        const initials = memberName
-          .split(" ")
-          .map((n) => n.charAt(0))
-          .join("")
-          .toUpperCase()
-          .substring(0, 2);
-
-        return `
-          <div class="member-avatar-container" onclick="showMemberInfo('${memberName}', '${memberEmail}', '${memberRole}', '${joinDate}')">
-            <div class="member-avatar-large">
-              <span class="member-initials">${initials}</span>
-            </div>
-            <div class="member-name-overlay">${memberName}</div>
-          </div>`;
-      })
-      .join("");
-
-    membersList.innerHTML = `<div class="members-avatars-inline">${membersHTML}</div>`;
-  }
-
-  window.showMemberInfo = function (name, email, role, joinedDate) {
-    let modal = document.getElementById("memberInfoModal");
-    if (!modal) {
-      modal = document.createElement("div");
-      modal.id = "memberInfoModal";
-      modal.className = "modal-overlay";
-      modal.innerHTML = `
-        <div class="modal-content member-info-modal" role="dialog" aria-modal="true">
-          <div class="modal-title">Información del miembro</div>
-          <div class="modal-body">
-            <div class="member-details"></div>
-          </div>
-          <div class="modal-buttons">
-            <button class="modal-cancel-btn" onclick="closeMemberInfo()">Cerrar</button>
-          </div>
-        </div>`;
-      document.body.appendChild(modal);
-    }
-
-    modal.querySelector(".member-details").innerHTML = `
-      <div class="member-detail-item"><strong>Nombre:</strong> ${name}</div>
-      <div class="member-detail-item"><strong>Email:</strong> ${email}</div>
-      <div class="member-detail-item"><strong>Rol:</strong> ${role}</div>
-      <div class="member-detail-item"><strong>Se unió:</strong> ${joinedDate}</div>
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin-icon"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      Enviando solicitud...
     `;
 
-    modal.style.display = "flex";
-  };
+    try {
+      const res = await fetch(`${API_BASE}project/sendJoinRequest`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ project_id: project.id })
+      });
+      const data = await res.json();
 
-  window.closeMemberInfo = function () {
-    const modal = document.getElementById("memberInfoModal");
-    if (modal) modal.style.display = "none";
-  };
+      if (res.ok && data.success) {
+        if (window.showToast) {
+          window.showToast('¡Solicitud enviada!', 'El creador del proyecto revisará tu solicitud.', 'success');
+        }
+        btn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Solicitud enviada
+        `;
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+      } else {
+        throw new Error(data.message || 'Error al enviar la solicitud');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+        Unirse al Proyecto
+      `;
+      if (window.showToast) {
+        window.showToast('Error', err.message || 'No se pudo enviar la solicitud.', 'error');
+      }
+    }
+  }
 
-  document.addEventListener("click", (event) => {
-    const modal = document.getElementById("memberInfoModal");
-    if (modal && event.target === modal) modal.style.display = "none";
-  });
+  function handleLeaveClick() {
+    // Show leave confirmation modal
+    const leaveModal = document.getElementById('leaveConfirmModal');
+    if (leaveModal) {
+      leaveModal.style.display = 'flex';
+    }
+  }
 
-  window.addEventListener("resize", () => {
-    const titleElement = document.querySelector(".project-detail-title");
-    if (titleElement && project) titleElement.textContent = truncateTitleForMobile(project.title);
-  });
+  // ─── Leave Confirmation Modal ───────────────────────────────────────
+
+  const leaveConfirmModal = document.getElementById('leaveConfirmModal');
+  const leaveCancelBtn = document.getElementById('leaveCancelBtn');
+  const leaveConfirmBtn = document.getElementById('leaveConfirmBtn');
+
+  if (leaveCancelBtn) {
+    leaveCancelBtn.addEventListener('click', () => {
+      if (leaveConfirmModal) leaveConfirmModal.style.display = 'none';
+    });
+  }
+
+  if (leaveConfirmBtn) {
+    leaveConfirmBtn.addEventListener('click', async () => {
+      if (!currentUser) return;
+
+      leaveConfirmBtn.disabled = true;
+      leaveConfirmBtn.textContent = 'Abandonando...';
+
+      try {
+        const formData = new FormData();
+        formData.append('project_id', project.id);
+        formData.append('email', currentUser.email);
+
+        const res = await fetch(`${API_BASE}member/delete`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          if (window.showToast) {
+            window.showToast('Proyecto abandonado', 'Has abandonado el proyecto correctamente.', 'info');
+          }
+          setTimeout(() => window.location.reload(), 1200);
+        } else {
+          throw new Error(data.message || 'Error al abandonar');
+        }
+      } catch (err) {
+        if (window.showToast) {
+          window.showToast('Error', err.message || 'No se pudo abandonar el proyecto.', 'error');
+        }
+        leaveConfirmBtn.disabled = false;
+        leaveConfirmBtn.textContent = 'Sí, abandonar';
+      } finally {
+        if (leaveConfirmModal) leaveConfirmModal.style.display = 'none';
+      }
+    });
+  }
+
+  // Click outside to close leave modal
+  if (leaveConfirmModal) {
+    leaveConfirmModal.addEventListener('click', (e) => {
+      if (e.target === leaveConfirmModal) leaveConfirmModal.style.display = 'none';
+    });
+  }
+
+  // ─── Sidebar Setup ─────────────────────────────────────────────────
+
+  async function setupSidebar() {
+    const sidebar = document.getElementById('ownerSidebar');
+    if (!sidebar) return;
+
+    // Only show for creator or admin
+    if (!isCreator && !isAdmin) return;
+
+    sidebar.style.display = 'flex';
+
+    // Set edit link
+    const editBtn = document.getElementById('editProjectBtn');
+    if (editBtn) {
+      editBtn.href = `project-edit?id=${project.id}`;
+    }
+
+    // Load join requests
+    await loadJoinRequests();
+
+    // Load sidebar members
+    renderSidebarMembers();
+  }
+
+  // ─── Join Requests Panel ───────────────────────────────────────────
+
+  async function loadJoinRequests() {
+    const requestsList = document.getElementById('requestsList');
+    const requestsCount = document.getElementById('requestsCount');
+    if (!requestsList) return;
+
+    try {
+      const requests = await fetchJoinRequests(project.id);
+
+      if (requests.length === 0) {
+        requestsList.innerHTML = `<p class="pd-sidebar-empty">No hay solicitudes pendientes</p>`;
+        if (requestsCount) requestsCount.style.display = 'none';
+        return;
+      }
+
+      if (requestsCount) {
+        requestsCount.textContent = requests.length;
+        requestsCount.style.display = 'inline-flex';
+      }
+
+      requestsList.innerHTML = requests.map(req => {
+        const initials = getInitials(req.user_name || req.name || 'U');
+        const name = esc(req.user_name || req.name || 'Usuario');
+        const email = esc(req.email || '');
+
+        return `
+          <div class="pd-request-card" data-request-id="${req.id}">
+            <div class="pd-request-avatar">${initials}</div>
+            <div class="pd-request-info">
+              <div class="pd-request-name">${name}</div>
+              <div class="pd-request-email">${email}</div>
+            </div>
+            <div class="pd-request-actions">
+              <button class="pd-btn-approve" title="Aprobar" data-action="approve" data-id="${req.id}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="pd-btn-reject" title="Rechazar" data-action="reject" data-id="${req.id}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Bind approve/reject events
+      requestsList.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', handleRequestAction);
+      });
+    } catch {
+      requestsList.innerHTML = `<p class="pd-sidebar-empty">Error cargando solicitudes</p>`;
+    }
+  }
+
+  async function handleRequestAction(e) {
+    const btn = e.currentTarget;
+    const action = btn.dataset.action;
+    const requestId = btn.dataset.id;
+    const card = btn.closest('.pd-request-card');
+
+    btn.disabled = true;
+
+    try {
+      const endpoint = action === 'approve'
+        ? 'project/approveJoinRequest'
+        : 'project/rejectJoinRequest';
+
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ request_id: requestId })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Animate removal
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(20px)';
+        card.style.transition = 'all 0.3s ease';
+
+        setTimeout(() => {
+          card.remove();
+          updateRequestsCount();
+
+          // Refresh members if approved
+          if (action === 'approve') {
+            refreshMembers();
+          }
+        }, 300);
+
+        const msg = action === 'approve' ? 'Solicitud aprobada' : 'Solicitud rechazada';
+        if (window.showToast) window.showToast('Hecho', msg, action === 'approve' ? 'success' : 'info');
+      } else {
+        throw new Error(data.message || 'Error al procesar');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      if (window.showToast) window.showToast('Error', err.message, 'error');
+    }
+  }
+
+  function updateRequestsCount() {
+    const requestsList = document.getElementById('requestsList');
+    const requestsCount = document.getElementById('requestsCount');
+    if (!requestsList || !requestsCount) return;
+
+    const remaining = requestsList.querySelectorAll('.pd-request-card').length;
+    if (remaining === 0) {
+      requestsList.innerHTML = `<p class="pd-sidebar-empty">No hay solicitudes pendientes</p>`;
+      requestsCount.style.display = 'none';
+    } else {
+      requestsCount.textContent = remaining;
+    }
+  }
+
+  // ─── Sidebar Members ───────────────────────────────────────────────
+
+  function renderSidebarMembers() {
+    const list = document.getElementById('sidebarMembersList');
+    if (!list) return;
+
+    if (members.length === 0) {
+      list.innerHTML = `<p class="pd-sidebar-empty">No hay miembros aún</p>`;
+      return;
+    }
+
+    // Sort: creator first
+    const sorted = [...members].sort((a, b) => {
+      const aCreator = String(a.user_id) === String(project.created_by_user_id);
+      const bCreator = String(b.user_id) === String(project.created_by_user_id);
+      if (aCreator && !bCreator) return -1;
+      if (!aCreator && bCreator) return 1;
+      return 0;
+    });
+
+    list.innerHTML = sorted.map(m => {
+      const memberIsCreator = String(m.user_id) === String(project.created_by_user_id);
+      const initials = getInitials(m.user_name || m.name || 'U');
+      const name = esc(m.user_name || m.name || 'Usuario');
+      const roleText = memberIsCreator ? 'Creador' : (m.role || 'Miembro');
+      const roleClass = memberIsCreator ? 'creator' : '';
+
+      // Kick button (not for creator)
+      const kickBtn = !memberIsCreator
+        ? `<button class="pd-btn-kick" data-user-id="${m.user_id}" data-action="kick" title="Expulsar">Expulsar</button>`
+        : '';
+
+      return `
+        <div class="pd-smember-card" data-member-id="${m.user_id}">
+          <div class="pd-smember-avatar">${initials}</div>
+          <div class="pd-smember-info">
+            <div class="pd-smember-name">${name}</div>
+            <div class="pd-smember-role ${roleClass}">${esc(roleText)}</div>
+          </div>
+          ${kickBtn}
+        </div>
+      `;
+    }).join('');
+
+    // Bind kick events
+    list.querySelectorAll('[data-action="kick"]').forEach(btn => {
+      btn.addEventListener('click', handleKickMember);
+    });
+  }
+
+  async function handleKickMember(e) {
+    const btn = e.currentTarget;
+    const targetUserId = btn.dataset.userId;
+    const card = btn.closest('.pd-smember-card');
+
+    if (!confirm('¿Expulsar a este miembro del proyecto?')) return;
+
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+      const res = await fetch(`${API_BASE}project/removeMember`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          project_id: project.id,
+          user_id: targetUserId
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(20px)';
+        card.style.transition = 'all 0.3s ease';
+
+        setTimeout(() => {
+          card.remove();
+          refreshMembers();
+        }, 300);
+
+        if (window.showToast) window.showToast('Miembro expulsado', 'El usuario ha sido removido del equipo.', 'info');
+      } else {
+        throw new Error(data.message || 'Error al expulsar');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Expulsar';
+      if (window.showToast) window.showToast('Error', err.message, 'error');
+    }
+  }
+
+  // ─── Refresh Members (after approve or kick) ──────────────────────
+
+  async function refreshMembers() {
+    members = await fetchMembers(projectId);
+
+    // Check if current user membership status changed
+    if (currentUser) {
+      isMember = members.some(m => String(m.user_id) === String(currentUser.id));
+    }
+
+    // Re-render team in main content
+    const teamSection = mainContent.querySelector('.pd-team-section');
+    const newTeamHtml = renderTeamSection();
+
+    if (teamSection && newTeamHtml) {
+      teamSection.outerHTML = newTeamHtml;
+    } else if (!teamSection && newTeamHtml) {
+      // Insert before interaction section
+      const interaction = mainContent.querySelector('.pd-interaction');
+      if (interaction) {
+        interaction.insertAdjacentHTML('beforebegin', newTeamHtml);
+      } else {
+        mainContent.insertAdjacentHTML('beforeend', newTeamHtml);
+      }
+    }
+
+    // Re-render sidebar members
+    renderSidebarMembers();
+  }
+
+  // ─── Delete Modal ──────────────────────────────────────────────────
+
+  function setupDeleteModal() {
+    const deleteBtn = document.getElementById('deleteProjectBtn');
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelBtn = document.getElementById('deleteCancelBtn');
+    const confirmBtn = document.getElementById('deleteConfirmBtn');
+
+    if (!deleteBtn || !deleteModal) return;
+
+    deleteBtn.addEventListener('click', () => {
+      deleteModal.style.display = 'flex';
+    });
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        deleteModal.style.display = 'none';
+      });
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Eliminando...';
+
+        try {
+          const fd = new FormData();
+          fd.append('id', project.id);
+          fd.append('project_id', project.id);
+
+          const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+          const res = await fetch(`${API_BASE}project/delete`, {
+            method: 'POST',
+            headers: { Authorization: token ? `Bearer ${token}` : '' },
+            body: fd
+          });
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            if (window.showToast) window.showToast('Eliminado', 'El proyecto ha sido eliminado.', 'success');
+            setTimeout(() => window.location.href = 'project-list', 1200);
+          } else {
+            throw new Error(data.message || 'Error al eliminar');
+          }
+        } catch (err) {
+          if (window.showToast) window.showToast('Error', err.message, 'error');
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = 'Eliminar';
+        } finally {
+          deleteModal.style.display = 'none';
+        }
+      });
+    }
+
+    // Close on overlay click
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) deleteModal.style.display = 'none';
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (deleteModal.style.display === 'flex') deleteModal.style.display = 'none';
+        if (leaveConfirmModal?.style.display === 'flex') leaveConfirmModal.style.display = 'none';
+      }
+    });
+  }
 });
 
-function showNotification(message, type = "success") {
-  const notification = document.createElement("div");
+// ─── Legacy Notification Support ────────────────────────────────────
+
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
   notification.className = `notification ${type}`;
   notification.textContent = message;
   document.body.appendChild(notification);
-
-  setTimeout(() => {
-    notification.remove();
-  }, 2600);
+  setTimeout(() => notification.remove(), 2600);
 }
