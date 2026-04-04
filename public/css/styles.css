@@ -252,11 +252,10 @@ section {
 /* --- AI COMMUNITY CTA --- */
 
 .ai-community-full {
-  background: #020617; /* Un gradiente estilo la imagen */
-  padding: 4rem 2rem;
+  background: transparent;
+  padding: 2rem 2rem 4rem; /* Altura reducida */
   text-align: center;
   color: var(--color-text-light);
-
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -268,28 +267,22 @@ section {
 }
 
 .ai-community-illustration img {
-  width: 220px;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.3));
+  width: 380px; 
+  margin-bottom: 0; /* Eliminamos margen para acercar */
+  filter: drop-shadow(0px 10px 25px rgba(0, 0, 0, 0.4));
 }
 
 .ai-community-title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  margin-bottom: 0.8rem;
-  color: var(
-    --color-primary
-  ); /* fallback for browsers that don't support clipping */
-  background: linear-gradient(
-    135deg,
-    var(--color-text-light) 0%,
-    var(--color-secondary) 50%,
-    var(--color-primary) 100%
-  );
-  background-clip: text; /* unprefixed attempt */
-  -webkit-background-clip: text;
-  color: transparent; /* unprefixed transparent */
-  -webkit-text-fill-color: transparent;
+  font-size: 3rem; /* Tamaño unificado con .section-title */
+  font-weight: 700;
+  margin-top: -4rem; /* Margen negativo para compensar espacio de la imagen */
+  margin-bottom: 1rem;
+  color: #ffffff; /* Blanco sólido igual que Mentores y Cronograma */
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: initial;
+  letter-spacing: -1px;
 }
 
 .ai-community-subtitle {
@@ -352,7 +345,13 @@ section {
   }
 
   .ai-community-title {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
+    color: #ffffff;
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+    letter-spacing: -1px;
   }
 
   .ai-community-buttons {

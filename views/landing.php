@@ -74,127 +74,93 @@
 
         <section class="cta-padre">
             <div class="cta-proyectos">
-                <img src="./public/images/desarrolladora.png" alt="AI Comunidad">
+                <img src="./public/images/ai-community.png" alt="AI Comunidad">
 
             </div>
             <div class="visual-banner-cta">
-                <a href="project-list" class="hero-cta">Ver Proyectos UTN FRSR</a>
+                <a href="project-list" class="hero-cta">Ver Proyectos</a>
             </div>
             
         </section>
 
 
         <section class="community-section">
-            <div class="container">
-            </div>
             <div class="community-header">
-                <h2 class="section-title">Speakeners</h2>
-                <p class="community-subtitle">Aprende de expertos de la industria y líderes de opinión</p>
+                <h2 class="section-title">AiMentores</h2>
+                <div class="community-subtitle">
+                    4 mentores que liderarán la Hackatón de AIWKND San Rafael. Estos expertos estarán presentes el sábado y el domingo para guiar a los equipos, destrabar ideas y transformar proyectos en soluciones reales con Inteligencia Artificial.
+                    <br><br>
+                    Conocé al equipo que te acompañará codo a codo para solventar cada necesidad técnica y estratégica:
+                </div>
             </div>
 
             <div class="collaborators-grid">
+                <!-- Mentor 1: Alexa Davila -->
                 <div class="collaborator-card">
                     <div class="card-image-container">
-                        <img src="public/images/speakers/Alejandro Bacic.png" alt="Foto de perfil"
-                            class="collaborator-img">
+                        <img src="public/images/speakers/Antonella Calabro.png" alt="Alexa Davila" class="collaborator-img">
                     </div>
                     <div class="card-content">
-                        <h3 class="collaborator-name">Alejandro Bacic</h3>
-                        <div class="collaborator-role">AIWKND</div>
-                        <br>
-                        <p class="collaborator-bio">AI FUTURO - ICONNECT</p>
-
+                        <h3 class="collaborator-name">Alexa Davila</h3>
+                        <div class="collaborator-role">Venezuela</div>
+                        <p class="collaborator-bio">Storytelling y narrativas. Te ayudará a contar tu idea de la mejor manera para impactar al jurado.</p>
+                        <a href="#" class="btn-ig" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            Ver Perfil
+                        </a>
                     </div>
                 </div>
 
+                <!-- Mentor 2: Andy Lizewski -->
                 <div class="collaborator-card">
                     <div class="card-image-container">
-                        <img src="public/images/speakers/Damian Kesler.png" alt="Foto de perfil"
-                            class="collaborator-img">
+                        <img src="public/images/speakers/Alejandro Bacic.png" alt="Andy Lizewski" class="collaborator-img">
                     </div>
                     <div class="card-content">
-                        <h3 class="collaborator-name">Damián Kesler</h3>
-                        <div class="collaborator-role">NOVEDADESIA.SR</div>
-                        <br>
-                        <p class="collaborator-bio">La evolución de la IA, info noticias, actualidad y usos de la
-                            IA.</p>
-
-                    </div>
-                </div>
-                <div class="collaborator-card">
-                    <div class="card-image-container">
-                        <img src="public/images/speakers/Antonella Calabro.png" alt="Foto de perfil"
-                            class="collaborator-img">
-                    </div>
-
-                    <div class="card-content">
-                        <h3 class="collaborator-name">Antonella Calabró</h3>
-                        <div class="collaborator-role">Pdta. PIT REGIÓN SUR MENDOZA</div>
-                        <br>
-                        <p class="collaborator-bio">Upskills para el futuro: Cómo UX, Dev y producto construyen
-                            juntos en la era de la IA.</p>
+                        <h3 class="collaborator-name">Andy Lizewski</h3>
+                        <div class="collaborator-role">Río Negro</div>
+                        <p class="collaborator-bio">Aportará su visión creativa y artística única para potenciar la estética y el concepto de tu proyecto.</p>
+                        <a href="#" class="btn-ig" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            Ver Perfil
+                        </a>
                     </div>
                 </div>
 
+                <!-- Mentor 3: Ariel Esquivel -->
+                <div class="collaborator-card">
+                    <div class="card-image-container">
+                        <img src="public/images/speakers/Damian Kesler.png" alt="Ariel Esquivel" class="collaborator-img">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="collaborator-name">Ariel Esquivel</h3>
+                        <div class="collaborator-role">Corrientes</div>
+                        <p class="collaborator-bio">Experto en soluciones de IA, listo para asesorar en la implementación técnica y arquitectura de cada idea.</p>
+                        <a href="#" class="btn-ig" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            Ver Perfil
+                        </a>
+                    </div>
+                </div>
 
-
+                <!-- Mentor 4: Camila Suarez -->
+                <div class="collaborator-card">
+                    <div class="card-image-container">
+                        <img src="public/images/speakers/Agus Muñoz.png" alt="Camila Suarez" class="collaborator-img">
+                    </div>
+                    <div class="card-content">
+                        <h3 class="collaborator-name">Camila Suarez</h3>
+                        <div class="collaborator-role">Buenos Aires</div>
+                        <p class="collaborator-bio">Sólida base estratégica para asegurar que cada proyecto tenga un impacto real, viable y escalable.</p>
+                        <a href="#" class="btn-ig" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            Ver Perfil
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="collaborators-grid">
-                <div class="collaborator-card">
-                    <div class="card-image-container">
-                        <img src="public/images/speakers/Alejandro Alegre.png" alt="Foto de perfil"
-                            class="collaborator-img">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="collaborator-name">Alejandro Alegre</h3>
-                        <div class="collaborator-role">VIVA STUDIO</div>
-                        <br>
-                        <p class="collaborator-bio">IMPOSSIBLE AI NOTHING</p>
+        </section>
 
-                    </div>
-                </div>
-
-                <div class="collaborator-card">
-                    <div class="card-image-container">
-                        <img src="public/images/speakers/Lautaro Silva.png" alt="Foto de perfil"
-                            class="collaborator-img">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="collaborator-name">Lautaro Silva</h3>
-                        <div class="collaborator-role">SENTINEL</div>
-                        <br>
-                        <p class="collaborator-bio"></p>
-
-                    </div>
-                </div>
-
-                <div class="collaborator-card">
-                    <div class="card-image-container">
-                        <img src="public/images/speakers/Agus Muñoz.png" alt="Foto de perfil" class="collaborator-img">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="collaborator-name">Agus Muñoz</h3>
-                        <div class="collaborator-role">CONDOR VIEW</div>
-                        <br>
-                        <p class="collaborator-bio"></p>
-
-                    </div>
-                </div>
-
-                <div class="collaborator-card">
-                    <div class="card-image-container">
-                        <img src="public/images/speakers/Mauro Rojas.png" alt="Foto de perfil" class="collaborator-img">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="collaborator-name">Mauro Rojas</h3>
-                        <div class="collaborator-role">ALPHA DOCERE</div>
-                        <br>
-                        <p class="collaborator-bio"></p>
-
-                    </div>
-                </div>
-                <!-- Más collaborator-cards limpias y coherentes -->
-            </div>
     </div>
     </section>
 
@@ -202,7 +168,7 @@
 
     <section class="schedule-section" id="cronograma">
         <div class="container">
-            <h2 class="section-title">Cronograma de la Hackatón</h2>
+            <h2 class="section-title">AiCronograma</h2>
 
             <!-- Tabs de Navegación -->
             <div class="schedule-tabs">
@@ -350,6 +316,10 @@
 
         </div>
         <div class="helpers-logos">
+            <div class="sponsors-header">
+                <h3 class="sponsors-title">AiSponsors</h3>
+                <p class="sponsors-subtitle">Empresas que hacen posible AIWKND</p>
+            </div>
             <div id="marquee">
                 <a href="#" target="_blank" title="">
                     <img src="public/images/mendoza.png" alt="" />
@@ -413,8 +383,8 @@
             </p>
 
             <div class="ai-community-buttons">
-                <a href="register" class="ai-btn-primary">Únete Ahora</a>
-                <a href="community" class="ai-btn-secondary">Conoce Más</a>
+                <a href="https://www.aiweekend.tech/" target="_blank" class="ai-btn-primary">Únete Ahora</a>
+                <a href="https://www.aiweekend.tech/" target="_blank" class="ai-btn-secondary">Conoce Más</a>
             </div>
         </div>
     </section>

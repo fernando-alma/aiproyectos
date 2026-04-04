@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIWKND - Acceder</title>
-    <link rel="stylesheet" href="public/css/nav-styles.css">
+    <title>Acceder | AIWKND</title>
+    
+    <!-- Estilos Unificados -->
+    <link rel="stylesheet" href="public/css/nav-styles.css?v=4.5">
     <link rel="stylesheet" href="public/css/styles.css">
-    <link rel="stylesheet" href="public/css/login.css">
-    <link rel="stylesheet" href="public/css/footer.css"> 
+    <link rel="stylesheet" href="public/css/auth-modern.css">
+    <link rel="stylesheet" href="public/css/footer.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
     <?php require_once("components/nav.php"); ?>
-    <div class="container">
 
-        
-        <main class="main-content">
-            <form class="login-form solid-dark" id="loginForm">
-                <h1 class="page-title" style="text-align: center;">Acceder</h1>
+    <main class="auth-page">
+        <div class="auth-card">
+            <h1 class="auth-title">Acceder</h1>
+            <p class="auth-subtitle">Ingresa tus credenciales para continuar</p>
+
+            <form id="loginForm" class="auth-grid">
                 <div class="form-group">
                     <label for="username">Dirección de email</label>
                     <input type="email" id="username" name="username" class="form-input" placeholder="ejemplo@aiweekend.com" required>
@@ -25,31 +29,20 @@
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+                    <a href="recover-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
                 </div>
-                
-                <div class="form-group-check">
-                    <label class="checkbox-container">
-                        <p type="checkbox" id="mantenerSesion" name="mantenerSesion">
-                        <span class="checkbox-label"></span>
-                    </label>
-                </div>
-                
-                <div class="forgot-password">
-                    <span class="forgot-text">¿Olvidaste tu contraseña?</span>
-                    <a href="recover-password" class="forgot-link">Recupera tu contraseña aquí</a>
-                </div>
-                
-                <button type="submit" class="login-btn">Acceder</button>
-                
-                <div class="register-link">
-                    <span class="register-text">¿No tienes cuenta?</span>
-                    <a href="register" class="register-link-btn">Regístrate aquí</a>
-                </div>
+
+                <button type="submit" class="auth-submit">Acceder</button>
             </form>
-        </main>
-        <?php require_once ("components/footer.php"); ?>
-    </div>
-    
+
+            <div class="auth-footer">
+                <span>¿No tienes cuenta?</span>
+                <a href="register" class="auth-link">Regístrate aquí</a>
+            </div>
+        </div>
+    </main>
+
+    <?php require_once ("components/footer.php"); ?>
     <script src="public/js/login.js"></script>
 </body>
-</html>
+</html>

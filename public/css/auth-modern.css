@@ -1,0 +1,203 @@
+/* ==========================================================================
+   AUTH MODERN — AIWEEKEND Design System
+   Glassmorphism + Mountain Background + Neon Interaction
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --aiw-pink: #ff00de;
+  --aiw-purple: #7b2ff7;
+  --aiw-cyan: #00f5ea;
+  --glass-bg: rgba(9, 9, 11, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px 60px;
+  position: relative;
+  /* Fondo transparente para dejar ver los orbes animados del nav.php */
+  background: transparent;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  /* Fondo de montañas ahora dentro de la tarjeta igual que Mentores */
+  background-image: 
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.45), rgba(9, 9, 11, 0.9)),
+    url('../images/fondos/card-bg-mentor.png');
+  background-size: cover;
+  background-position: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 3px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, border-color, box-shadow;
+  overflow: hidden;
+}
+
+/* Redimensionar solo en registro si es necesario */
+.auth-card.register-wide {
+  max-width: 700px;
+}
+
+.auth-card:hover {
+  border-color: var(--aiw-pink);
+  box-shadow: 0 0 35px rgba(255, 0, 222, 0.25);
+  transform: translateY(-2px);
+}
+
+/* ── Typography ────────────────────────────────────────────────────────── */
+.auth-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  margin-bottom: 2.2rem;
+  font-weight: 500;
+}
+
+/* ── Form Layout ───────────────────────────────────────────────────────── */
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+/* Escritorio: Registro en dos columnas */
+@media (min-width: 768px) {
+  .register-wide .auth-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+}
+
+.col-left, .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  margin-left: 0.25rem;
+}
+
+.form-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--aiw-cyan);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 4px rgba(0, 245, 234, 0.1);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Actions ───────────────────────────────────────────────────────────── */
+.auth-submit {
+  background: linear-gradient(135deg, var(--aiw-pink), var(--aiw-purple));
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.auth-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 0, 222, 0.3);
+  filter: brightness(1.1);
+}
+
+.auth-submit:active {
+  transform: scale(0.98);
+}
+
+.auth-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  margin-left: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+  color: var(--aiw-cyan);
+  text-decoration: underline;
+}
+
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  margin-top: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.forgot-link:hover {
+  color: #fff;
+}
+
+/* ── Animations ────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card {
+  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
