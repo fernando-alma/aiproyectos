@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/auth-modern.css">
     <link rel="stylesheet" href="public/css/footer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>

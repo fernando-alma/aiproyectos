@@ -17,7 +17,8 @@
 /* Contenido principal del footer (secciones) */
 .footer-content {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between; /* Separar contenido a los extremos */
+    align-items: center;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
@@ -26,128 +27,123 @@
 
 /* Estilo de la primera sección (logo y texto) */
 .footer-section.about {
-    flex: 2; 
-    max-width: 300px;
+    flex: 1; 
+    max-width: 400px;
 }
 
-/* 2. Nuevo estilo para el Logo (Alineación y Cercanía) */
+/* Columna de Redes Sociales (Derecha) */
+.footer-section.social-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinear a la derecha */
+    text-align: right;
+}
+
+.social-heading {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-texto-secundario);
+    margin-bottom: 12px;
+}
+
+/* 2. Nuevo estilo para el Logo */
 .footer-logo {
-    width: 200px; 
+    width: 180px; 
     height: auto;
-    margin-bottom: 0px; 
-    margin-top: 0px; 
-    margin-left: -30px; 
+    margin-bottom: 10px; 
+    margin-left: -5px; 
     display: block;
 }
 
-/* 3. Párrafo descriptivo (Alineación y Cercanía) */
+/* 3. Párrafo descriptivo */
 .footer-section.about p {
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: var(--color-texto-secundario);
-    
-    margin-top: -8px; 
-    margin-bottom: 20px;
-    margin-left: 0px; 
-}
-
-/* Títulos de las columnas (se mantiene) */
-.footer-section h3 {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--color-texto-principal);
-    margin-bottom: 15px;
-}
-
-/* Lista de enlaces (Efecto Hover de color) */
-.footer-section ul {
-    list-style: none;
-    padding: 0;
     margin: 0;
 }
 
-.footer-section ul li a {
-    text-decoration: none;
-    color: var(--color-texto-secundario);
-    font-size: 14px;
-    transition: color 0.3s;
-    display: inline-block;
+/* Estilo para los iconos de redes sociales */
+.social-links {
+    display: flex;
+    gap: 12px;
 }
 
-.footer-section ul li a:hover {
-    color: var(--color-texto-principal); 
-}
-/* Estilo para la caja contenedora (el enlace <a>) */
 .social-links a {
-    font-size: 0; 
-    margin-right: 15px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    
-    /* Forma y tamaño del círculo */
-    width: 40px; /* Tamaño ligeramente ajustado */
-    height: 40px; 
+    width: 42px;
+    height: 42px; 
     border-radius: 50%; 
-    background-color: var(--color-texto-principal); 
-    border: 1px solid var(--color-texto-principal); 
-    display: inline-flex;
+    background-color: #fff !important; 
+    display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none !important;
 }
 
-/* Efecto Hover:*/
+.social-links a i {
+    color: #000 !important; /* Forzar el color negro del icono vectorial */
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
 .social-links a:hover {
-    scale: 1.1;
-    background-color: #eee; 
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* Estilo para la IMAGEN PNG dentro del enlace */
-.social-links a img {
-    /* Ocupa la mayor parte del círculo */
-    width: 38px; 
-    height: 38px;
-    display: block;
-    margin: 0;
+.social-links a:hover i {
+    color: var(--aiw-cyan) !important; /* Color de acento en hover */
 }
 
-/* Línea divisoria (más compacta) */
+/* Línea divisoria */
 .footer-divider {
     border: 0;
     height: 1px;
     background-color: var(--color-separador);
-    margin: 30px auto 15px; 
+    margin: 40px auto 20px; 
     max-width: 1200px;
+    opacity: 0.5;
 }
 
-/* Sección de derechos de autor */
+/* Sección de derechos de autor (Flex Layout) */
 .footer-bottom {
-    text-align: center;
-    font-size: 12px;
-    color: var(--color-texto-secundario);
-    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.developer-credit {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 /* Media Queries para responsividad */
 @media (max-width: 768px) {
     .footer-content {
-        flex-wrap: wrap; 
-        justify-content: flex-start;
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
     }
     
-    .footer-section {
-        flex: 0 0 45%; 
-        margin-bottom: 30px;
+    .footer-section.social-column {
+        align-items: center;
+        text-align: center;
     }
-    
-    .footer-section.about {
-        flex: 0 0 100%; 
-        max-width: 100%;
-    }
-}
 
-@media (max-width: 480px) {
-    .footer-section {
-        flex: 0 0 100%; 
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
     }
-}
+    
+    .footer-logo {
+        margin: 0 auto 15px;
+    }
+}
