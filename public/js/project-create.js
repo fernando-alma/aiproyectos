@@ -1,156 +1,117 @@
+/**
+ * project-create.js — AIWEEKEND
+ *
+ * Handles: FormData capture, Bearer auth, image preview,
+ * char counter, Toast notifications, redirect.
+ */
+
 const API_BASE = CONFIG.API_BASE;
 const CURRENT_SLUG = CONFIG.SLUG;
 
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('projectCreateForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const imageInput = document.getElementById('image');
+  const uploadZone = document.getElementById('uploadZone');
+  const imagePreview = document.getElementById('imagePreview');
+  const descArea = document.getElementById('description');
+  const charCount = document.getElementById('descCharCount');
 
-document.addEventListener("DOMContentLoaded", () => {
-  const capitalsForm = document.getElementById("capitalsForm");
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-  if (capitalsForm) {
-    capitalsForm.addEventListener("submit", async function (e) {
+  // ─── Char Counter ────────────────────────────────────────────────────
+  if (descArea && charCount) {
+    const maxLen = parseInt(descArea.getAttribute('maxlength')) || 2000;
+
+    descArea.addEventListener('input', () => {
+      const len = descArea.value.length;
+      charCount.textContent = `${len} / ${maxLen}`;
+      charCount.classList.toggle('near-limit', len > maxLen * 0.8 && len < maxLen);
+      charCount.classList.toggle('at-limit', len >= maxLen);
+    });
+  }
+
+  // ─── Image Preview ───────────────────────────────────────────────────
+  if (imageInput) {
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          imagePreview.src = ev.target.result;
+          uploadZone.classList.add('has-preview');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        uploadZone.classList.remove('has-preview');
+        imagePreview.src = '';
+      }
+    });
+  }
+
+  // ─── Form Submit ─────────────────────────────────────────────────────
+  if (form) {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Obtener datos del formulario
-      const formData = new FormData(this);
-      formData.append('slug', CURRENT_SLUG);
-      formData.append('status', 'in_progress');
+      const title = document.getElementById('title').value.trim();
+      const description = descArea.value.trim();
 
-      // Validación simple
-      if (!formData.get('title') || !formData.get('description')) {
-        alert("Por favor, completa todos los campos requeridos.");
+      if (!title || !description) {
+        if (window.showToast) window.showToast('Campos requeridos', 'Completa título y descripción.', 'error');
         return;
       }
 
-      // Botón de envío
-      const submitButton = this.querySelector("[type='submit']");
-      const originalText = submitButton.textContent;
+      // Build FormData
+      const formData = new FormData(form);
+      formData.append('slug', CURRENT_SLUG);
+      formData.append('status', 'in_progress');
 
-      submitButton.textContent = "Enviando...";
-      submitButton.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        Creando...
+      `;
 
       try {
-        const response = await fetch(`${API_BASE}project/create`, {
+        const headers = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const res = await fetch(`${API_BASE}project/create`, {
           method: 'POST',
+          headers,
           body: formData
         });
-        const data = await response.json();
+        const data = await res.json();
 
-        if (data.success) {
-          // Obtener ID del proyecto creado desde varias formas de respuesta posibles
-          const projectId = (data && (data.project?.id || data.data?.id || data.id || data.project_id || data.data?.project_id)) || null;
+        if (res.ok && data.success) {
+          if (window.showToast) window.showToast('¡Proyecto creado!', 'Tu proyecto se registró correctamente.', 'success');
 
-          // SOLUCIÓN FRONTEND: Almacenar información del creador para tratarlo como owner funcionalmente
-          (async () => {
-            try {
-              if (projectId && typeof window.getUserData === 'function') {
-                const userData = window.getUserData();
-                if (userData && userData.userEmail) {
-                  console.log('🎯 SOLUCIÓN FRONTEND: Almacenando información del creador como owner funcional');
-                  
-                  // Almacenar información del creador en localStorage
-                  const creatorInfo = {
-                    projectId: projectId,
-                    email: userData.userEmail,
-                    name: userData.userName || userData.username || '',
-                    role: 'owner', // Rol funcional
-                    isCreator: true,
-                    createdAt: new Date().toISOString()
-                  };
-                  
-                  // Obtener lista existente de creadores
-                  let creators = JSON.parse(localStorage.getItem('projectCreators') || '[]');
-                  
-                  // Agregar o actualizar información del creador
-                  const existingIndex = creators.findIndex(c => c.projectId === projectId);
-                  if (existingIndex >= 0) {
-                    creators[existingIndex] = creatorInfo;
-                  } else {
-                    creators.push(creatorInfo);
-                  }
-                  
-                  localStorage.setItem('projectCreators', JSON.stringify(creators));
-                  console.log('✅ Información del creador almacenada:', creatorInfo);
-                  
-                  // Agregar al usuario como member (para que aparezca en la lista de miembros)
-                  const joinForm = new FormData();
-                  joinForm.append('project_id', projectId);
-                  joinForm.append('name', userData.userName || userData.username || '');
-                  joinForm.append('email', userData.userEmail);
-                  joinForm.append('role', 'member'); // El backend solo acepta member
+          form.reset();
+          uploadZone.classList.remove('has-preview');
 
-                  try {
-                    const sendReq = await fetch(`${API_BASE}project/sendJoinRequest`, { method: 'POST', body: joinForm });
-                    const sendData = await sendReq.json().catch(() => ({}));
-                    if (sendReq.ok && sendData && sendData.success) {
-                      // Buscar y aprobar la solicitud
-                      const listResp = await fetch(`${API_BASE}project/getJoinRequests?project_id=${projectId}`);
-                      const listData = await listResp.json().catch(() => ({}));
-                      if (listResp.ok && listData && listData.success && Array.isArray(listData.requests)) {
-                        const myReq = listData.requests.find(r => r && (r.email === userData.userEmail));
-                        if (myReq && myReq.id) {
-                          // Aprobar la solicitud
-                          const params = new URLSearchParams();
-                          params.append('request_id', myReq.id);
-                          const approveResp = await fetch(`${API_BASE}project/approveJoinRequest`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: params.toString()
-                          });
-                          const approveData = await approveResp.json().catch(() => ({}));
-                          
-                          if (approveResp.ok && approveData && approveData.success) {
-                            console.log('✅ Usuario agregado como member (pero funcionalmente será owner)');
-                            
-                            // Actualizar membresía local
-                            if (typeof window.updateProjectMembership === 'function') {
-                              window.updateProjectMembership(projectId, true);
-                            }
-                          }
-                        }
-                      }
-                    }
-                  } catch (error) {
-                    console.log('⚠️ Error al agregar como member, pero el creador ya está registrado funcionalmente');
-                  }
-                }
-              }
-            } catch (error) {
-              console.error('❌ Error en solución frontend:', error);
-            }
-          })();
-
-          showNotification("¡Proyecto creado exitosamente!", 'success');
-          this.reset();
-          // Redirigir al landing después de crear el proyecto
           setTimeout(() => {
             window.location.href = 'project-list';
           }, 1500);
         } else {
-          showNotification(data.message || "Error al crear el proyecto.", 'error');
+          throw new Error(data.message || 'Error al crear el proyecto');
         }
-      } catch (error) {
-        console.error('Error:', error);
-        showNotification("Error de conexión. Inténtalo de nuevo.", 'error');
-      } finally {
-        submitButton.textContent = originalText;
-        submitButton.disabled = false;
+      } catch (err) {
+        if (window.showToast) window.showToast('Error', err.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Crear Proyecto
+        `;
       }
     });
   }
 
-  // Botón cancelar
-  const cancelButton = document.getElementById("cancelButton");
-  if (cancelButton) {
-    cancelButton.addEventListener("click", () => {
-      capitalsForm.reset();
+  // ─── Cancel ──────────────────────────────────────────────────────────
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
       window.history.back();
     });
   }
-
 });
-
-function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-}
