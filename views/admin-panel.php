@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIWKND — Centro de Control Admin</title>
     <meta name="description" content="Panel de administración del sistema AIWKND. Gestión de usuarios, hackathons y métricas.">
-    <link rel="stylesheet" href="public/css/nav-styles.css">
+    <link rel="stylesheet" href="public/css/nav-styles.css?v=4.5">
     <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/admin.css">
     <link rel="stylesheet" href="public/css/footer.css">

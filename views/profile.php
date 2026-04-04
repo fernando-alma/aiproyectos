@@ -1,108 +1,159 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil</title>
-    <link rel="stylesheet" href="public/css/nav-styles.css">
+    <title>Mi Perfil | AIWKND</title>
+    <meta name="description" content="Gestiona tu perfil, proyectos y solicitudes en AIWKND.">
+    <link rel="stylesheet" href="public/css/nav-styles.css?v=4.5">
     <link rel="stylesheet" href="public/css/styles.css">
-    <link rel="stylesheet" href="public/css/login.css">
-    <link rel="stylesheet" href="public/css/account.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="public/css/footer.css"> 
+    <link rel="stylesheet" href="public/css/profile.css">
+    <link rel="stylesheet" href="public/css/footer.css">
 </head>
+
 <body>
     <?php require_once("components/nav.php"); ?>
 
+    <main class="prof-page">
+        <div class="prof-shell">
 
-    <style>
-        .profile-wide-card {
-            max-width: 800px !important;
-            width: 100%;
-            background: rgba(77, 26, 88, 0.6) !important; /* Medio rosa oscuro transparente */
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 105, 180, 0.2);
-            padding: 40px !important;
-            margin: 0 auto;
-        }
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-        .profile-input-override {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-        @media (max-width: 768px) {
-            .profile-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .profile-wide-card {
-                padding: 25px !important;
-            }
-            .profile-actions-row {
-                flex-direction: column;
-            }
-        }
-    </style>
-
-    <main class="main-content" style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 80px); padding: 20px;">
-        <form class="login-form capitals-form solid-dark profile-wide-card" id="profileForm">
-            <h1 class="page-title" style="text-align: center; margin-bottom: 30px;">Mi Perfil</h1>
-            
-            <div class="profile-grid">
-                <!-- Columna Izquierda (Avatar y Nombre) -->
-                <div>
-                    <div style="display: flex; justify-content: center; margin-bottom: 30px;">
-                        <img src="public/images/weekeners.png" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--aiw-cyan);">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="profileName">Nombre del perfil</label>
-                        <input type="text" id="profileName" class="form-input profile-input-override" value="Cargando...">
-                    </div>
-                </div>
-
-                <!-- Columna Derecha (Cambiar Contraseña) -->
-                <div>
-                    <h3 style="color: white; text-align: center; font-family: 'Raleway', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 25px;">
-                        Cambiar Contraseña
-                    </h3>
-
-                    <div class="form-group">
-                        <label for="currentPassword">Contraseña Actual</label>
-                        <input type="password" id="currentPassword" name="currentPassword" class="form-input profile-input-override" placeholder="••••••••">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="newPassword">Nueva Contraseña</label>
-                        <input type="password" id="newPassword" name="newPassword" class="form-input profile-input-override" placeholder="Min. 8 caracteres">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirmar Nueva Contraseña</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input profile-input-override" placeholder="Repite la nueva contraseña">
-                    </div>
-                </div>
+            <!-- ═══ Header ═══ -->
+            <div class="prof-header">
+                <h1 class="prof-title">Mi Perfil</h1>
+                <p class="prof-subtitle">Gestiona tu información, proyectos y solicitudes</p>
             </div>
 
-            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 30px 0;">
+            <!-- ═══ Section 1: Mis Datos ═══ -->
+            <section class="prof-card glass-effect" id="sectionDatos">
+                <div class="prof-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span>Mis Datos</span>
+                </div>
 
-            <!-- Fila de Botones unificada -->
-            <div class="profile-actions-row" style="display: flex; gap: 15px; justify-content: center; max-width: 600px; margin: 0 auto;">
-                <button type="button" class="login-btn" id="logoutButton" style="background: transparent; border: 1px solid var(--aiw-pink); color: var(--aiw-pink); flex: 1; min-width: 140px; margin: 0;">Cerrar Sesión</button>
-                <button type="submit" class="login-btn" style="flex: 1; min-width: 140px; margin: 0;" id="saveProfileBtn">Cambiar contraseña</button>
+                <div class="prof-datos-grid">
+                    <!-- Left: avatar + name -->
+                    <div class="prof-datos-left">
+                        <div class="prof-avatar" id="profileAvatar">
+                            <span id="profileInitials">?</span>
+                        </div>
+                        <div class="prof-group">
+                            <label class="prof-label" for="profileName">Nombre</label>
+                            <small class="prof-hint">Tu nombre visible en la plataforma</small>
+                            <input type="text" id="profileName" class="prof-input" value="Cargando...">
+                        </div>
+                        <div class="prof-group">
+                            <label class="prof-label">Email</label>
+                            <small class="prof-hint">Tu dirección de correo (no editable)</small>
+                            <input type="email" id="profileEmail" class="prof-input" readonly disabled>
+                        </div>
+                        <button type="button" class="prof-btn prof-btn--save" id="saveNameBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                <polyline points="17 21 17 13 7 13 7 21" />
+                                <polyline points="7 3 7 8 15 8" />
+                            </svg>
+                            Guardar Nombre
+                        </button>
+                    </div>
+
+                    <!-- Right: change password -->
+                    <div class="prof-datos-right">
+                        <h3 class="prof-section-title">Cambiar Contraseña</h3>
+                        <form id="changePasswordForm">
+                            <div class="prof-group">
+                                <label class="prof-label" for="currentPassword">Contraseña Actual</label>
+                                <small class="prof-hint">Ingresa tu contraseña actual</small>
+                                <input type="password" id="currentPassword" class="prof-input"
+                                    placeholder="••••••••">
+                            </div>
+                            <div class="prof-group">
+                                <label class="prof-label" for="newPassword">Nueva Contraseña</label>
+                                <small class="prof-hint">Mínimo 8 caracteres</small>
+                                <input type="password" id="newPassword" class="prof-input"
+                                    placeholder="Mínimo 8 caracteres">
+                            </div>
+                            <div class="prof-group">
+                                <label class="prof-label" for="confirmPassword">Confirmar</label>
+                                <small class="prof-hint">Repite la nueva contraseña</small>
+                                <input type="password" id="confirmPassword" class="prof-input"
+                                    placeholder="Repite la contraseña">
+                            </div>
+                            <button type="submit" class="prof-btn prof-btn--primary" id="savePasswordBtn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                </svg>
+                                Cambiar Contraseña
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══ Create Project CTA ═══ -->
+            <div id="createProjectCta"></div>
+
+            <!-- ═══ Section 2: Mis Proyectos ═══ -->
+            <section class="prof-card glass-effect" id="sectionProyectos">
+                <div class="prof-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                        <path d="M9 18c-4.51 2-5-2-7-2" />
+                    </svg>
+                    <span>Mis Proyectos</span>
+                </div>
+                <div id="myProjectsList" class="prof-projects-list">
+                    <div class="prof-loading">Cargando proyectos...</div>
+                </div>
+            </section>
+
+            <!-- ═══ Section 3: Mis Solicitudes ═══ -->
+            <section class="prof-card glass-effect" id="sectionSolicitudes">
+                <div class="prof-card-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <line x1="19" x2="19" y1="8" y2="14" />
+                        <line x1="22" x2="16" y1="11" y2="11" />
+                    </svg>
+                    <span>Mis Solicitudes</span>
+                </div>
+                <div id="myRequestsList" class="prof-requests-list">
+                    <div class="prof-loading">Cargando solicitudes...</div>
+                </div>
+            </section>
+
+            <!-- ═══ Logout ═══ -->
+            <div class="prof-logout-zone">
+                <button type="button" class="prof-btn prof-btn--logout" id="logoutButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" x2="9" y1="12" y2="12" />
+                    </svg>
+                    Cerrar Sesión
+                </button>
             </div>
-        </form>
+
+        </div>
     </main>
-        
-    <?php require_once ("components/footer.php"); ?> 
-    
+
+    <?php require_once("components/footer.php"); ?>
     <script src="public/js/config.js"></script>
     <script src="public/js/session-check.js"></script>
     <script src="public/js/profile.js"></script>
 </body>
+
 </html>

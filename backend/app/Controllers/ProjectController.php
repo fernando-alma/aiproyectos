@@ -371,6 +371,19 @@ class ProjectController
         $this->sendJsonResponse(['success' => true, 'projects' => $projects]); 
     }
 
+    /**
+     * Obtener los proyectos del usuario actual
+     */
+    public function getProjectsByUser()
+    {
+        $userPayload = AuthMiddleware::require();
+        $userId = (int) $userPayload['sub'];
+        
+        $projects = $this->projectModel->getProjectsByUserId($userId);
+        
+        $this->sendJsonResponse(['success' => true, 'projects' => $projects]);
+    }
+
     // --- MÉTODOS EXISTENTES INTACTOS ---
     public function createProjectsMember() { $this->sendJsonResponse(['success'=>true, 'message'=>'Refactorizado. Usa approveJoinRequest.']); }
     public function getTasks() { $this->sendJsonResponse(['success'=>true, 'tasks'=>[]]); }

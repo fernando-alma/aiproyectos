@@ -94,7 +94,7 @@ $appUrl = $_ENV['APP_URL'] ?? 'http://localhost/aiproyectos';
 </nav>
 
 <!-- Auth Script -->
-<script src="public/js/nav-auth.js" defer></script>
+<script src="public/js/nav-auth.js?v=4.5" defer></script>
 
 <script>
     const menuContainer = document.getElementById("menu-toggle-container");

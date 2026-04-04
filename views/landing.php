@@ -8,7 +8,7 @@
     
     <meta name="theme-color" content="#F17158">
     <!-- Estilos -->
-    <link rel="stylesheet" href="public/css/nav-styles.css">
+    <link rel="stylesheet" href="public/css/nav-styles.css?v=4.5">
     <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="public/css/landing.css">
     <link rel="stylesheet" href="public/css/footer.css">

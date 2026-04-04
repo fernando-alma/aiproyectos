@@ -49,6 +49,7 @@ return [
     'project/rejectJoinRequest'   => ['controller' => ProjectController::class, 'method' => 'rejectJoinRequest',  'httpMethod' => 'POST', 'protected' => true],
     'project/removeMember'        => ['controller' => ProjectController::class, 'method' => 'removeMember',       'httpMethod' => 'POST', 'protected' => true], // NUEVO: Para expulsar
     'project/getFollowedProjects' => ['controller' => ProjectController::class, 'method' => 'getFollowedProjects', 'httpMethod' => 'GET',  'protected' => true],
+    'projects/user'               => ['controller' => ProjectController::class, 'method' => 'getProjectsByUser', 'httpMethod' => 'GET',  'protected' => true],
 
     // --- TAREAS (Todas Protegidas) ---
     'task/create'       => ['controller' => TaskController::class, 'method' => 'create',       'httpMethod' => 'POST', 'protected' => true],

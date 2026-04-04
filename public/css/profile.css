@@ -1,0 +1,453 @@
+/* ==========================================================================
+   PROFILE PAGE — AIWEEKEND Design System
+   ========================================================================== */
+
+.prof-page {
+    padding-top: 90px;
+    padding-bottom: 3rem;
+    min-height: 100dvh;
+}
+
+.prof-shell {
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.prof-header {
+    margin-bottom: 2rem;
+}
+
+.prof-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+    margin-bottom: 0.3rem;
+}
+
+.prof-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+}
+
+/* ── Cards ─────────────────────────────────────────────────────────────── */
+.prof-card {
+    border-radius: 18px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    animation: profFadeIn 0.4s ease;
+}
+
+.prof-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.prof-card-header svg {
+    color: var(--aiw-cyan);
+    flex-shrink: 0;
+}
+
+.prof-card-header span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Datos Grid ────────────────────────────────────────────────────────── */
+.prof-datos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.prof-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.25rem;
+}
+
+/* ── Avatar ─────────────────────────────────────────────────────────────── */
+.prof-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--aiw-pink), var(--aiw-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 1.25rem;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.prof-avatar:hover {
+    transform: scale(1.05);
+}
+
+/* ── Form Groups ───────────────────────────────────────────────────────── */
+.prof-group {
+    margin-bottom: 1.25rem;
+}
+
+.prof-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.15rem;
+}
+
+.prof-hint {
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.25);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+}
+
+.prof-input {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.prof-input:focus {
+    outline: none;
+    border-color: var(--aiw-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 245, 234, 0.08);
+}
+
+.prof-input::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.prof-input:disabled,
+.prof-input[readonly] {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.prof-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.3rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.prof-btn:active {
+    transform: scale(0.97);
+}
+
+.prof-btn--save {
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.prof-btn--save:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.prof-btn--primary {
+    background: linear-gradient(135deg, var(--aiw-pink), var(--aiw-purple));
+    color: #fff;
+    width: 100%;
+    box-shadow: 0 0 16px rgba(237, 30, 121, 0.12);
+}
+
+.prof-btn--primary:hover {
+    box-shadow: 0 0 24px rgba(237, 30, 121, 0.25);
+    transform: translateY(-1px);
+}
+
+.prof-btn--primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.prof-btn--logout {
+    background: transparent;
+    color: var(--aiw-pink);
+    border: 1px solid rgba(237, 30, 121, 0.2);
+    width: 100%;
+    max-width: 220px;
+}
+
+.prof-btn--logout:hover {
+    background: rgba(237, 30, 121, 0.08);
+    border-color: var(--aiw-pink);
+}
+
+.prof-logout-zone {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+/* ── CTA (Crear Proyecto) ──────────────────────────────────────────────── */
+.prof-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 245, 234, 0.06), rgba(82, 22, 161, 0.1));
+    border: 1px dashed rgba(0, 245, 234, 0.15);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    animation: profFadeIn 0.5s ease;
+}
+
+.prof-cta:hover {
+    background: linear-gradient(135deg, rgba(0, 245, 234, 0.1), rgba(82, 22, 161, 0.15));
+    border-color: rgba(0, 245, 234, 0.3);
+    transform: translateY(-2px);
+}
+
+.prof-cta-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--aiw-cyan), var(--aiw-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.prof-cta-icon svg {
+    color: #fff;
+}
+
+.prof-cta-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.prof-cta-sub {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 500;
+}
+
+/* ── Project Cards ─────────────────────────────────────────────────────── */
+.prof-projects-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.prof-project-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.15s ease;
+}
+
+.prof-project-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.prof-project-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.prof-project-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.prof-project-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.prof-project-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.prof-badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.prof-badge--progress {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+}
+
+.prof-badge--completed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+}
+
+.prof-project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--aiw-cyan);
+    text-decoration: none;
+    background: rgba(0, 245, 234, 0.05);
+    border: 1px solid rgba(0, 245, 234, 0.1);
+    transition: all 0.15s ease;
+}
+
+.prof-project-link:hover {
+    background: rgba(0, 245, 234, 0.1);
+    border-color: var(--aiw-cyan);
+}
+
+/* ── Request Cards ─────────────────────────────────────────────────────── */
+.prof-requests-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.prof-request-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.prof-request-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.prof-badge--pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+}
+
+.prof-badge--approved {
+    background: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+}
+
+.prof-badge--rejected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+}
+
+/* ── Empty / Loading ───────────────────────────────────────────────────── */
+.prof-loading,
+.prof-empty {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+/* ── Animations ────────────────────────────────────────────────────────── */
+@keyframes profFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+    .prof-datos-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .prof-title {
+        font-size: 1.8rem;
+    }
+
+    .prof-shell {
+        max-width: 920px;
+    }
+
+    .prof-projects-list {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .prof-page {
+        padding-top: 80px;
+    }
+
+    .prof-card {
+        padding: 1.25rem;
+    }
+
+    .prof-cta {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.25rem;
+    }
+}

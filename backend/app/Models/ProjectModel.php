@@ -172,4 +172,14 @@ class ProjectModel
             'total_files' => 0
         ];
     }
-}
+
+    /**
+     * Obtiene los proyectos creados por un usuario específico.
+     */
+    public function getProjectsByUserId(int $userId): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM projects WHERE created_by_user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
