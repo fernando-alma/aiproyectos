@@ -20,19 +20,19 @@
     <div class="content-wrap">
         <section class="hero">
             <div class="hero-container">
-                <h1 class="hero-title"> AIWKND 2026 </h1>
+                <h1 class="hero-title"> AiProyectos <br> San Rafael 2026 </h1>
                 <p class="hero-subtitle">
                     Dos días para conectar talento, empresas e Inteligencia Artificial en el corazón de Los Reyunos.
                 </p>
                 <div class="visual-banner-cta">
-                    <a href="project-list" class="hero-cta">Ver Proyectos</a>
+                    <a href="project-list" class="hero-cta">Explorar AiProyectos</a>
                 </div>
             </div>
 
             <div class="container-stats">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-number">2</div>
+                        <div class="stat-number">3</div>
                         <div class="stat-label">Días</div>
                     </div>
                     <div class="stat-card">
@@ -40,7 +40,7 @@
                         <div class="stat-label">Participantes</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">7</div>
+                        <div class="stat-number">+27</div>
                         <div class="stat-label">Speakers</div>
                     </div>
                 </div>
@@ -49,38 +49,48 @@
         </section>
         </section>
 
-        <section class="features-section">
-            <div class="container">
-                <h2 class="section-title">¿Por qué AI Weekend?</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <h3 class="feature-title">Aprendizaje y Mentoría</h3>
-                        <p class="feature-description">Sesiones de la mano de expertos y referentes de la industria.
-                            Aprende las últimas tendencias de la IA.</p>
+        <section class="cta-padre">
+            <div class="container cta-flex">
+                <!-- Columna Izquierda: El Equipo (Ilustraciones) -->
+                <div class="cta-team-column">
+                    <div class="cta-illustration-wrapper">
+                        <img src="./public/images/ai-community.png" alt="AI Team" class="cta-floating-img">
                     </div>
-                    <div class="feature-card">
-                        <h3 class="feature-title">Networking Real</h3>
-                        <p class="feature-description">Conecta con desarrolladores, emprendedores e inversores. Crea
-                            lazos profesionales de alto valor.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3 class="feature-title">Impacto Social</h3>
-                        <p class="feature-description">Contribuye a la formación de una comunidad tecnológica más fuerte
-                            e inclusiva en la región.</p>
+                </div>
+
+                <!-- Columna Derecha: El Mensaje (Texto y Botón) -->
+                <div class="cta-content-column">
+                    <h2 class="cta-main-title">EXPLORA LA INNOVACIÓN EN MOVIMIENTO</h2>
+                    <p class="cta-description">
+                        Inspírate con las soluciones más innovadoras creadas por la comunidad AIWEEKEND en 48 horas de pura creatividad. Tu próxima gran idea está a un click.
+                    </p>
+                    <div class="cta-button-wrapper">
+                        <a href="project-list" class="hero-cta">Explorar AiProyectos</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="cta-padre">
-            <div class="cta-proyectos">
-                <img src="./public/images/ai-community.png" alt="AI Comunidad">
-
+        <section id="why-aiwknd">
+            <div class="container why-grid">
+                <!-- Columna Izquierda: Contenido -->
+                <div class="why-content">
+                    <div class="glass-effect why-card">
+                        <h2 class="why-title">¿Por qué AiWeekend?</h2>
+                        <p class="why-text">
+                            El evento de innovación, inteligencia artificial y negocios más importante de la región. Viví 3 días de experiencias, aprendizaje y conexiones reales en el Centro de Congresos y Exposiciones Alfredo R. Bufano (San Rafael, Mendoza).
+                        </p>
+                        
+                        <h3 class="why-subtitle">¿Qué vas a vivir?</h3>
+                        <p class="why-text">
+                            +20 conferencias de IA, 7 workshops prácticos, hackatón en equipo, networking estratégico y shows en vivo con bandas (sábado) y DJs + premiación (domingo).
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Columna Derecha: Vacía en HTML -->
+                <div class="why-empty"></div>
             </div>
-            <div class="visual-banner-cta">
-                <a href="project-list" class="hero-cta">Ver Proyectos</a>
-            </div>
-            
         </section>
 
 
@@ -372,7 +382,7 @@
     <section class="ai-community-full">
         <div class="ai-community-full-content">
             <div class="ai-community-illustration">
-                <img src="./public/images/ai-community.png" alt="AI Comunidad">
+                <img src="./public/images/creativo.png" alt="AI Comunidad">
             </div>
 
             <h2 class="ai-community-title">AiComunidad</h2>

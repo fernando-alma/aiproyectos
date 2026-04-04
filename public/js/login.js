@@ -1,7 +1,7 @@
-const loginF = document.querySelector("form");
+const loginF = document.querySelector("#loginForm");
 
 // Configuración bloqueo login por intentos fallidos
-const loginBtn = document.querySelector(".login-btn");
+const loginBtn = document.querySelector(".auth-submit");
 let intentosFallidos = parseInt(localStorage.getItem("intentosFallidos")) || 0;
 const maxIntentos = 5;
 const bloqueoTiempo = 120; //Segundos
@@ -10,6 +10,7 @@ const bloqueoTiempo = 120; //Segundos
 window.addEventListener("load", verificarBloqueo);
 
 function verificarBloqueo() {
+  if (!loginBtn) return;
   const bloqueoHasta = parseInt(localStorage.getItem("bloqueoLoginHasta"));
   const ahora = Date.now();
   if (bloqueoHasta && bloqueoHasta > ahora) {
@@ -25,6 +26,7 @@ function verificarBloqueo() {
 
 // Timer bloqueo
 function actualizarMensajeBloqueo() {
+  if (!loginBtn) return;
   const bloqueoHasta = parseInt(localStorage.getItem("bloqueoLoginHasta"));
   const ahora = Date.now();
   if (bloqueoHasta > ahora) {
@@ -33,7 +35,7 @@ function actualizarMensajeBloqueo() {
     setTimeout(actualizarMensajeBloqueo, 1000);
   } else {
     loginBtn.disabled = false;
-    loginBtn.textContent = "Iniciar sesión";
+    loginBtn.textContent = "Acceder";
     localStorage.removeItem("bloqueoLoginHasta");
     localStorage.setItem("intentosFallidos", "0");
     intentosFallidos = 0;
@@ -63,7 +65,7 @@ loginF.addEventListener("submit", async (event) => {
   event.preventDefault();
   const username = document.querySelector("#username").value;
   const password = document.querySelector("#password").value;
-  const mantenerSesion = document.querySelector("#mantenerSesion").checked;
+  const mantenerSesion = document.querySelector("#mantenerSesion")?.checked || false;
 
   if (!username || !password) {
     window.showToast("Datos incompletos", "Por favor ingresa ambos campos: usuario y contraseña.", 'error');

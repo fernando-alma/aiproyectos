@@ -29,7 +29,15 @@
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
-                    <a href="recover-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                    
+                    <div class="auth-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="mantenerSesion" name="mantenerSesion">
+                            <span class="checkbox-custom"></span>
+                            Mantener sesión
+                        </label>
+                        <a href="recover-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                    </div>
                 </div>
 
                 <button type="submit" class="auth-submit">Acceder</button>

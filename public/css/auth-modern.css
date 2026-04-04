@@ -178,18 +178,81 @@
   text-decoration: underline;
 }
 
+.auth-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
 .forgot-link {
-  display: block;
-  text-align: right;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.4);
   text-decoration: none;
-  margin-top: 0.25rem;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .forgot-link:hover {
-  color: #fff;
+  color: var(--aiw-cyan);
+  text-shadow: 0 0 8px rgba(0, 245, 234, 0.3);
+}
+
+/* Custom Checkbox "Maintain Session" */
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-me input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-custom {
+  height: 18px;
+  width: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  position: relative;
+}
+
+.remember-me:hover input ~ .checkbox-custom {
+  border-color: var(--aiw-cyan);
+  box-shadow: 0 0 10px rgba(0, 245, 234, 0.2);
+}
+
+.remember-me input:checked ~ .checkbox-custom {
+  background: var(--aiw-cyan);
+  border-color: var(--aiw-cyan);
+  box-shadow: 0 0 15px rgba(0, 245, 234, 0.4);
+}
+
+.checkbox-custom:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 9px;
+  border: solid #09090b;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.remember-me input:checked ~ .checkbox-custom:after {
+  display: block;
 }
 
 /* ── Animations ────────────────────────────────────────────────────────── */

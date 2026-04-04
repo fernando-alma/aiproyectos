@@ -1,8 +1,8 @@
 // register.js — Apunta al backend propio (auth/register)
 // Ya no depende del sistema externo alphadocere.cl
 
-const form = document.querySelector("form");
-const submitBtn = form ? form.querySelector("[type=submit]") : null;
+const form = document.querySelector("#register-form");
+const submitBtn = form ? form.querySelector(".auth-submit") : null;
 
 // La antigua función local showNotification fue reemplazada por la global window.showToast()
 

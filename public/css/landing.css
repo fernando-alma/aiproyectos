@@ -92,22 +92,151 @@
 
 
 .cta-padre {
-  text-align: center;
-  padding: 4rem 1rem;
-  background-color: #29102660;
+  padding: 6rem 1rem;
+  background-color: #29102660; /* Fondo dinámico y tecnológico */
+  overflow: hidden;
 }
-.cta-proyectos {
-  text-align: center;
-  padding: 4rem 1rem;
+
+.cta-flex {
   display: flex;
-  margin:  0 auto;
+  align-items: center;
+  gap: 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Columna Izquierda: El Equipo */
+.cta-team-column {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-illustration-wrapper {
+  position: relative;
+  display: flex;
   justify-content: center;
 }
-  
-.cta-proyectos > img {
-  width: 60%;
+
+.cta-floating-img {
+  width: 100%;
   max-width: 450px;
-  /* Eliminamos el border-radius para los personajes 3D */
+  height: auto;
+  animation: ailevitation 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
+}
+
+/* Animación de Levitación Suave */
+@keyframes ailevitation {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Columna Derecha: El Mensaje */
+.cta-content-column {
+  flex: 1;
+  text-align: left;
+}
+
+.cta-main-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1.5px;
+  color: #ffffff;
+}
+
+.cta-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.45); /* Estilo sutil (text-gray-400) */
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+.cta-button-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* --- Why AIWKND Section --- */
+#why-aiwknd {
+  padding: 6rem 5%;
+  background-image: 
+    linear-gradient(to right, rgba(9, 9, 11, 0.95) 0%, rgba(9, 9, 11, 0.7) 40%, rgba(9, 9, 11, 0.1) 100%), 
+    url('../images/fondo-ppal-san-ra.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #ffffff;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .why-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.why-card {
+  padding: 3rem;
+  border-radius: 24px;
+}
+
+.why-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  margin-bottom: 1.25rem;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.why-subtitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.why-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ffffff !important;
+  margin-bottom: 1.1rem;
+}
+
+@media (max-width: 767px) {
+  #why-aiwknd {
+    background-image: 
+      linear-gradient(to bottom, rgba(9, 9, 11, 0.9) 0%, rgba(9, 9, 11, 0.7) 100%), 
+      url('../images/fondo-ppal-san-ra.jpg');
+    background-attachment: scroll;
+    padding: 4rem 1rem;
+  }
+  
+  .why-title {
+    font-size: 1.8rem;
+  }
+  
+  .why-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .why-card {
+    padding: 1.5rem;
+  }
 }
 
 
@@ -477,6 +606,35 @@
 
 /* Responsive Schedule */
 @media (max-width: 640px) {
+  /* CTA Sección Mobile */
+  .cta-flex {
+    flex-direction: column-reverse; /* Mensaje arriba, imagen abajo */
+    gap: 2rem; /* Reducido de 4rem para mayor proximidad */
+    padding: 0 1rem;
+  }
+
+  .cta-content-column {
+    text-align: center;
+  }
+
+  .cta-main-title {
+    font-size: 2.2rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .cta-description {
+    margin: 0 auto 1.5rem; /* Reducido de 2rem */
+    font-size: 1rem;
+  }
+
+  .cta-button-wrapper {
+    justify-content: center;
+  }
+
+  .cta-floating-img {
+    max-width: 320px;
+  }
+
   .schedule-item {
     grid-template-columns: 1fr;
     gap: 0.5rem;

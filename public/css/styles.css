@@ -82,39 +82,6 @@ section {
 }
 
 /* Features Section */
-.features-section {
-  padding: 3rem 0;
-}
-.features-grid {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.feature-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: transform 0.3s, background 0.3s;
-}
-
-.feature-card:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.feature-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--color-accent);
-  margin-bottom: 0.75rem;
-}
-
-.feature-description {
-  font-size: 0.95rem;
-  color: var(--color-text-dim);
-}
-
 /* Video Responsive Container (For YouTube Embed) */
 .video-responsive-container {
   position: relative;
@@ -267,21 +234,18 @@ section {
 }
 
 .ai-community-illustration img {
-  width: 380px; 
-  margin-bottom: 0; /* Eliminamos margen para acercar */
+  width: 340px; /* Ajustado al 90% exacto de 380px */
+  margin-bottom: 0.5rem; /* Un poco de margen inferior para separar del texto */
   filter: drop-shadow(0px 10px 25px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s ease;
 }
 
 .ai-community-title {
-  font-size: 3rem; /* Tamaño unificado con .section-title */
+  font-size: 3rem; 
   font-weight: 700;
-  margin-top: -4rem; /* Margen negativo para compensar espacio de la imagen */
-  margin-bottom: 1rem;
-  color: #ffffff; /* Blanco sólido igual que Mentores y Cronograma */
-  background: none;
-  -webkit-background-clip: initial;
-  background-clip: initial;
-  -webkit-text-fill-color: initial;
+  margin-top: -1rem; /* Eliminado el margen negativo agresivo para alejar la imagen */
+  margin-bottom: 1.5rem;
+  color: #ffffff; 
   letter-spacing: -1px;
 }
 
@@ -472,6 +436,17 @@ section {
     margin: 0 auto;
   }
 }
+
+  /* Optimizaciones para móvil (base) */
+  @media (max-width: 767px) {
+    .ai-community-illustration img {
+      width: 280px; 
+    }
+    .ai-community-title {
+      font-size: 2.2rem;
+      margin-top: 0; /* Sin margen negativo en móvil para máxima claridad */
+    }
+  }
 
 @media (min-width: 1024px) {
   .hero-title {
