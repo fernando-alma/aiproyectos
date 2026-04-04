@@ -14,7 +14,8 @@
     <?php require_once("components/nav.php"); ?>
     <section class="projects-section">
         <div class="projects-container container"> 
-            <h1 class="projects-title section-title">Catálogo de Proyectos</h1>
+            <h1 class="projects-title section-title">Galería de AiProyectos</h1>
+            <p class="projects-subtitle">Explora las soluciones creadas por nuestra comunidad. Prototipos, ideas y demos funcionales nacidos en 48 horas de pura creatividad.</p>
 
             <div class="search-bar" id="search-bar">
             <div class="position: relative;">

@@ -99,8 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    projects.forEach((project) => {
+    projects.forEach((project, index) => {
       const projectCard = document.createElement("div");
+      projectCard.style.animationDelay = `${index * 0.08}s`;
       const projectImg = document.createElement("img");
       projectCard.classList.add("project-card");
       projectImg.classList.add("project-image");
@@ -153,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevButton = document.createElement("button");
     prevButton.className = "pagination-button";
     prevButton.disabled = page === 1;
-    prevButton.textContent = "Anterior";
+    prevButton.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
     prevButton.addEventListener("click", () => {
       currentPage = Math.max(1, currentPage - 1);
       renderPage();
@@ -177,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextButton = document.createElement("button");
     nextButton.className = "pagination-button";
     nextButton.disabled = page === totalPages;
-    nextButton.textContent = "Siguiente";
+    nextButton.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
     nextButton.addEventListener("click", () => {
       currentPage = Math.min(totalPages, currentPage + 1);
       renderPage();
