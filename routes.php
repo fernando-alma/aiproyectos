@@ -12,5 +12,6 @@ return [
     'project-detail' => __DIR__ . '/views/project-detail.php',
     'project-create' => __DIR__ . '/views/project-create.php',
     'project-edit' => __DIR__ . '/views/project-edit.php',
+    'admin-panel' => __DIR__ . '/views/admin-panel.php',
     'not-found' => __DIR__ . '/views/not-found.php',
 ];
